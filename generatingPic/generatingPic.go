@@ -17,7 +17,7 @@ const (
 	TIMEOUT          = 60 * time.Second
 	reconnectDelay   = 5 * time.Second
 	writeTimeout     = 10 * time.Second
-	readTimeout      = 30 * time.Second
+	readTimeout      = 120 * time.Second
 )
 
 type AuthCredentials struct {

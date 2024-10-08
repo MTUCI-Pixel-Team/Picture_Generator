@@ -32,7 +32,8 @@ type Bot struct {
 }
 
 var modelsOptions = map[string]string{
-	"epiCRealism":     "civitai:25694@143906",
+	"default":         "runware:100@1@1",
+	"ponyRealism":     "civitai:372465@914390",
 	"GhostMix":        "civitai:36520@76907",
 	"RealisticVision": "civitai:178853@F47E942AD4",
 	"DreamShaper":     "civitai:622@879DB523C3",
@@ -41,7 +42,7 @@ var modelsOptions = map[string]string{
 	"JuggernautXL":    "civitai:178853@F47E942AD4",
 }
 
-var stepsOptions = []int{10, 50, 100, 300, 500}
+var stepsOptions = []int{10, 20, 30, 50, 60}
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -74,6 +75,8 @@ func (b *Bot) Start(ctx context.Context) {
 	var wg sync.WaitGroup
 	for update := range updates {
 
+		b.userStates[update.Message.Chat.ID] = "done"
+
 		wsClient := gp.NewWSClient(os.Getenv("API_KEY2"))
 
 		go wsClient.Start(ctx)
@@ -83,7 +86,6 @@ func (b *Bot) Start(ctx context.Context) {
 		if update.Message == nil {
 			continue
 		}
-
 		switch update.Message.Text {
 		case "/start":
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID,
@@ -100,10 +102,27 @@ func (b *Bot) Start(ctx context.Context) {
 			wg.Wait()
 			return
 		case "/settings":
-			go handleSettings(b, update, updates)
-			return
+			handleSettings(b, update, updates)
+			continue
 		default:
 			log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
+
+			if len(update.Message.Text) < 3 {
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Description must be longer than 3 characters.")
+				b.tg.Send(msg)
+				return
+			}
+			b.settingsMutex.Lock()
+			settings, exists := b.userSettings[update.Message.Chat.ID]
+			if !exists {
+				// По умолчанию
+				settings = &UserSettings{
+					steps: 15,
+					model: "runware:100@1@1",
+				}
+				b.userSettings[update.Message.Chat.ID] = settings
+			}
+			b.settingsMutex.Unlock()
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Generating a picture, please wait...")
 			b.tg.Send(msg)
 			wg.Add(1)
@@ -113,8 +132,8 @@ func (b *Bot) Start(ctx context.Context) {
 				hexUUID = strings.ReplaceAll(hexUUID, "-", "")
 				msg := gp.Message{
 					PositivePrompt: string(update.Message.Text),
-					Model:          "runware:100@1@1",
-					Steps:          100,
+					Model:          b.userSettings[update.Message.Chat.ID].model,
+					Steps:          b.userSettings[update.Message.Chat.ID].steps,
 					Width:          512,
 					Height:         512,
 					NumberResults:  1,
@@ -131,6 +150,7 @@ func (b *Bot) Start(ctx context.Context) {
 					log.Println(err)
 				}
 			}()
+
 		}
 	}
 	wg.Wait()
@@ -151,8 +171,14 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 		b.userSettings[chatID] = settings
 	}
 	b.settingsMutex.Unlock()
+	modelName := ""
+	for key, value := range modelsOptions {
+		if value == settings.model {
+			modelName = key
+		}
+	}
 	// Выводим пользователю текущие настройки
-	text := fmt.Sprintf(`Your current settings Model: " %s ", Steps: " %d "Please choose an option. More info in \help`, settings.model, settings.steps)
+	text := fmt.Sprintf(`Your current settings Model: "%s", Steps: "%d" Please choose an option. More info in /help`, modelName, settings.steps)
 	msg := tgbotapi.NewMessage(chatID, text)
 	replyKeyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
@@ -168,6 +194,7 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 	b.settingsMutex.Lock()
 	b.userStates[chatID] = "choosing_option"
 	b.settingsMutex.Unlock()
+
 	for update := range updates {
 		chatID := update.Message.Chat.ID
 		b.settingsMutex.Lock()
@@ -184,16 +211,28 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 			case "Models":
 				// Переходим к выбору модели
 				msg := tgbotapi.NewMessage(chatID, "Please choose a model:")
-				modelKeyboard := tgbotapi.NewReplyKeyboard(
-					tgbotapi.NewKeyboardButtonRow(
-						tgbotapi.NewKeyboardButton("runware:100@1@1"),
-						tgbotapi.NewKeyboardButton("runware:200@2@2"),
-					),
-				)
-				msg.ReplyMarkup = modelKeyboard
-				b.tg.Send(msg)
+				var keyboard [][]tgbotapi.KeyboardButton
 
-				// Изменяем состояние пользователя
+				var row []tgbotapi.KeyboardButton
+				i := 0
+				for key := range modelsOptions {
+					button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%s", key))
+					row = append(row, button)
+
+					// Если добавили три кнопки в ряд, создаем новый ряд
+					if (i+1)%3 == 0 {
+						keyboard = append(keyboard, row)
+						row = []tgbotapi.KeyboardButton{} // Очищаем текущий ряд
+					}
+					i += 1
+				}
+
+				// Добавляем оставшиеся кнопки, если они есть
+				if len(row) > 0 {
+					keyboard = append(keyboard, row)
+				}
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
+				b.tg.Send(msg)
 				b.settingsMutex.Lock()
 				b.userStates[chatID] = "choosing_model"
 				b.settingsMutex.Unlock()
@@ -229,19 +268,54 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 			}
 
 		case "choosing_model":
-			// Обработка выбранной модели
+			// Строку в число (ascii to integer)
 			model := update.Message.Text
-			b.settingsMutex.Lock()
-			settings, exists := b.userSettings[chatID]
-			if exists {
-				settings.model = model
-				b.userSettings[chatID] = settings
+			// Проверка на вхождение введенного числа в список доступных значений
+			ok := 0
+			for key := range modelsOptions {
+				if key == model {
+					ok = 1
+				}
 			}
-			b.userStates[chatID] = "done"
-			b.settingsMutex.Unlock()
+			if ok == 1 {
+				b.settingsMutex.Lock()
+				settings, exists := b.userSettings[chatID]
+				if exists {
+					settings.model = modelsOptions[model]
+					b.userSettings[chatID] = settings
+				}
+				b.userStates[chatID] = "done"
+				b.settingsMutex.Unlock()
 
-			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Model set to: %s", model))
-			b.tg.Send(msg)
+				msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Model set to: %s", model))
+				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+				b.tg.Send(msg)
+				return
+			} else if ok == 0 {
+				msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a model from keyboard.")
+				var keyboard [][]tgbotapi.KeyboardButton
+
+				var row []tgbotapi.KeyboardButton
+				i := 0
+				for key := range modelsOptions {
+					button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%s", key))
+					row = append(row, button)
+
+					// Если добавили три кнопки в ряд, создаем новый ряд
+					if (i+1)%3 == 0 {
+						keyboard = append(keyboard, row)
+						row = []tgbotapi.KeyboardButton{} // Очищаем текущий ряд
+					}
+					i += 1
+				}
+
+				// Добавляем оставшиеся кнопки, если они есть
+				if len(row) > 0 {
+					keyboard = append(keyboard, row)
+				}
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
+				b.tg.Send(msg)
+			}
 
 		case "choosing_steps":
 			// Строку в число (ascii to integer)
@@ -264,8 +338,10 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 				b.settingsMutex.Unlock()
 
 				msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Steps set to: %d", steps))
+				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 				b.tg.Send(msg)
-			} else {
+				return
+			} else if err != nil || ok == 0 {
 				msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a number from keyboard.")
 				var keyboard [][]tgbotapi.KeyboardButton
 
