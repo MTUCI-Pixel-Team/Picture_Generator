@@ -81,6 +81,7 @@ func (b *Bot) Start(ctx context.Context) {
 	log.Println("Bot is starting")
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
+	b.tg.Buffer = 100
 
 	updates := b.tg.GetUpdatesChan(u)
 
@@ -121,6 +122,9 @@ func (b *Bot) Start(ctx context.Context) {
 					"Hello! I'm a bot that can generate a picture for you. Just send me a message with a description of the picture you want to get. Description must be in English and be longer than 3 characters.")
 				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 				b.tg.Send(msg)
+				// b.tg.StopReceivingUpdates()
+				// updates = b.tg.GetUpdatesChan(u)
+				// break
 			case "/help":
 				msg := tgbotapi.NewMessage(chatID,
 					"Available commands: \n/start - restart the bot \n/help - get help \n/models - list of all models for generate \n/steps - all variants of steps: More steps - better picture, but longer generation.\nTo generate a message, enter a description here.")
@@ -141,6 +145,7 @@ func (b *Bot) Start(ctx context.Context) {
 				b.userSettings[chatID].state = "showVariableSize"
 				b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
+
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 

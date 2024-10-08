@@ -17,8 +17,8 @@ const (
 	RECEIVE_BUF_SIZE = 10
 	TIMEOUT          = 60 * time.Second
 	reconnectDelay   = 5 * time.Second
-	writeTimeout     = 10 * time.Second
-	readTimeout      = 120 * time.Second
+	writeTimeout     = 5 * time.Second
+	readTimeout      = 45 * time.Second
 )
 
 type AuthCredentials struct {
