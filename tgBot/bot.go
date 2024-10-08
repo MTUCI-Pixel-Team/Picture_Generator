@@ -32,17 +32,17 @@ type Bot struct {
 }
 
 var modelsOptions = map[string]string{
-	"default":         "runware:100@1@1",
-	"ponyRealism":     "civitai:372465@914390",
-	"GhostMix":        "civitai:36520@76907",
-	"RealisticVision": "civitai:178853@F47E942AD4",
-	"DreamShaper":     "civitai:622@879DB523C3",
-	"CyberRealistic":  "civitai:36520@76907",
-	"AbsoluteReality": "civitai:36520@76907",
-	"JuggernautXL":    "civitai:178853@F47E942AD4",
+	"default":          "runware:100@1@1",
+	"epicRealism":      "civitai:25694@143906",
+	"FLUX":             "civitai:618692@922358",
+	"Anime":            "civitai:404154@931577",
+	"iNiverse":         "civitai:226533@929474",
+	"2DN Pony":         "civitai:520661@933040",
+	"JuggernautXL":     "civitai:133005@782002",
+	"Realistic vision": "civitai:4201@501240",
 }
 
-var stepsOptions = []int{10, 20, 30, 50, 60}
+var stepsOptions = []int{10, 20, 30, 50, 75, 100}
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -165,7 +165,7 @@ func handleSettings(b *Bot, update tgbotapi.Update, updates tgbotapi.UpdatesChan
 	if !exists {
 		// По умолчанию
 		settings = &UserSettings{
-			steps: 100,
+			steps: 15,
 			model: "runware:100@1@1",
 		}
 		b.userSettings[chatID] = settings

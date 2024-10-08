@@ -132,7 +132,6 @@ func (ws *WSClient) sendPump(ctx context.Context) {
 			if err != nil {
 				ws.ErrChan <- err
 			}
-
 			err = ws.socket.WriteMessage(websocket.TextMessage, jsonMsg)
 			if err != nil {
 				ws.ErrChan <- err
