@@ -193,7 +193,6 @@ func (ws *WSClient) errorHandler(ctx context.Context) {
 			return
 		case err := <-ws.ErrChan:
 			log.Printf("WebSocket error: %v", err)
-			ws.socket.Close()
 		}
 	}
 }
