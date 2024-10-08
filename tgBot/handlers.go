@@ -113,3 +113,55 @@ func handleModels(b *Bot, message string, chatID int64) {
 
 	}
 }
+
+func handleSize(b *Bot, message string, chatID int64) {
+	b.settingsMutex.Lock()
+	settings := b.userSettings[chatID]
+	b.settingsMutex.Unlock()
+	fmt.Println("STATE", settings.state)
+	switch settings.state {
+	case "showVariableSize":
+		sizeName := ""
+		for key, value := range sizeOptions {
+			if value[0] == settings.width && value[1] == settings.heigth {
+				sizeName = key
+				break
+			}
+			fmt.Println("SIZE", value[0], value[1], settings.width, settings.heigth)
+		}
+		// Переходим к выбору количества шагов
+		text := fmt.Sprintf(`Your size: "%s" Please choose one from keyboard. More info in /help`, sizeName)
+		msg := tgbotapi.NewMessage(chatID, text)
+		keyboard := getSizeMarkup()
+		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
+		b.tg.Send(msg)
+		b.settingsMutex.Lock()
+		b.userSettings[chatID].state = "chooseSize"
+		b.settingsMutex.Unlock()
+	case "chooseSize":
+		// Проверка на вхождение введенной модели в список доступных значений
+		ok := 0
+		for key := range sizeOptions {
+			if key == message {
+				ok = 1
+			}
+		}
+		if ok == 1 {
+			b.settingsMutex.Lock()
+			fmt.Println("SIZE", sizeOptions[message][0], sizeOptions[message][1])
+			b.userSettings[chatID].width = sizeOptions[message][0]
+			b.userSettings[chatID].heigth = sizeOptions[message][1]
+			b.userSettings[chatID].state = "done"
+			b.settingsMutex.Unlock()
+
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Size set to: %s", message))
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			b.tg.Send(msg)
+			return
+		} else if ok == 0 {
+			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a model from keyboard.")
+			b.tg.Send(msg)
+		}
+
+	}
+}

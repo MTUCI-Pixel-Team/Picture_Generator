@@ -3,6 +3,7 @@ package tgBot
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -15,9 +16,11 @@ import (
 )
 
 type UserSettings struct {
-	steps int
-	model string
-	state string
+	steps  int
+	model  string
+	width  int
+	heigth int
+	state  string
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -39,6 +42,16 @@ var modelsOptions = map[string]string{
 }
 
 var stepsOptions = []int{10, 20, 30, 50, 75, 100}
+
+var sizeOptions = map[string][2]int{
+	"1024x1024": {1024, 1024},
+	"768x768":   {768, 768},
+	"768x1152":  {768, 1152},
+	"1152x864":  {1152, 864},
+	"864x1152":  {864, 1152},
+	"1360x768":  {1360, 768},
+	"768x1360":  {768, 1360},
+}
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -88,9 +101,11 @@ func (b *Bot) Start(ctx context.Context) {
 		if !exists {
 			// По умолчанию
 			settings = &UserSettings{
-				steps: 15,
-				model: "runware:100@1@1",
-				state: "done",
+				steps:  15,
+				model:  "runware:100@1@1",
+				state:  "done",
+				heigth: 512,
+				width:  512,
 			}
 			b.userSettings[chatID] = settings
 		}
@@ -117,6 +132,11 @@ func (b *Bot) Start(ctx context.Context) {
 				b.userSettings[chatID].state = "showVariableSteps"
 				b.settingsMutex.Unlock()
 				handleSteps(b, update.Message.Text, chatID)
+			case "/size":
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].state = "showVariableSize"
+				b.settingsMutex.Unlock()
+				handleSize(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 
@@ -125,18 +145,6 @@ func (b *Bot) Start(ctx context.Context) {
 					b.tg.Send(msg)
 					return
 				}
-				b.settingsMutex.Lock()
-				settings, exists := b.userSettings[update.Message.Chat.ID]
-				if !exists {
-					// По умолчанию
-					settings = &UserSettings{
-						steps: 15,
-						model: "runware:100@1@1",
-						state: "done",
-					}
-					b.userSettings[update.Message.Chat.ID] = settings
-				}
-				b.settingsMutex.Unlock()
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Generating a picture, please wait...")
 				b.tg.Send(msg)
 				wg.Add(1)
@@ -144,12 +152,14 @@ func (b *Bot) Start(ctx context.Context) {
 					defer wg.Done()
 					hexUUID := uuid.New().String()
 					hexUUID = strings.ReplaceAll(hexUUID, "-", "")
+					fmt.Println("WIDTH", b.userSettings[update.Message.Chat.ID].width)
+					fmt.Println("HEIGTH", b.userSettings[update.Message.Chat.ID].heigth)
 					msg := gp.Message{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[update.Message.Chat.ID].model,
 						Steps:          b.userSettings[update.Message.Chat.ID].steps,
-						Width:          512,
-						Height:         512,
+						Width:          b.userSettings[update.Message.Chat.ID].width,
+						Height:         b.userSettings[update.Message.Chat.ID].heigth,
 						NumberResults:  1,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
@@ -162,6 +172,8 @@ func (b *Bot) Start(ctx context.Context) {
 						b.tg.Send(msg)
 					case err := <-wsClient.ErrChan:
 						log.Println(err)
+						msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Error occurred while generating a picture. Please try again or change your settings.")
+						b.tg.Send(msg)
 					}
 				}()
 
@@ -170,6 +182,9 @@ func (b *Bot) Start(ctx context.Context) {
 			handleModels(b, update.Message.Text, chatID)
 		case settings.state == "chooseSteps":
 			handleSteps(b, update.Message.Text, chatID)
+		case settings.state == "chooseSize":
+			handleSize(b, update.Message.Text, chatID)
+
 		}
 
 	}
