@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"golang.org/x/net/context"
 )
@@ -30,7 +28,6 @@ type AuthCredentials struct {
 type Message struct {
 	PositivePrompt string   `json:"positivePrompt"`
 	Model          string   `json:"model"`
-	Runware        string   `json:"runware"`
 	Steps          int      `json:"steps"`
 	Width          int      `json:"width"`
 	Height         int      `json:"height"`
@@ -44,7 +41,7 @@ type WSClient struct {
 	auth           AuthCredentials
 	url            string
 	socket         *websocket.Conn
-	SendMsgChan    chan []byte
+	SendMsgChan    chan Message
 	ReceiveMsgChan chan []byte
 	ErrChan        chan error
 	Done           chan struct{}
@@ -54,7 +51,7 @@ func NewWSClient(apiKey string) *WSClient {
 	return &WSClient{
 		auth:           AuthCredentials{"authentication", apiKey},
 		url:            URL,
-		SendMsgChan:    make(chan []byte, SEND_BUF_SIZE),
+		SendMsgChan:    make(chan Message),
 		ReceiveMsgChan: make(chan []byte, RECEIVE_BUF_SIZE),
 		ErrChan:        make(chan error),
 		Done:           make(chan struct{}),
@@ -128,20 +125,7 @@ func (ws *WSClient) sendPump(ctx context.Context) {
 			return
 		default:
 			ws.socket.SetWriteDeadline(time.Now().Add(writeTimeout))
-			msg := <-ws.SendMsgChan
-			hexUUID := uuid.New().String()
-			hexUUID = strings.ReplaceAll(hexUUID, "-", "")
-			req := Message{
-				PositivePrompt: string(msg),
-				Model:          "runware:100@1@1",
-				Steps:          100,
-				Width:          512,
-				Height:         512,
-				NumberResults:  1,
-				OutputType:     []string{"URL"},
-				TaskType:       "imageInference",
-				TaskUUID:       hexUUID,
-			}
+			req := <-ws.SendMsgChan
 			reqData := []Message{req}
 
 			jsonMsg, err := json.Marshal(reqData)

@@ -5,9 +5,11 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	gp "github.com/MTUCI-Pixel-Team/Picture_Generator/generatingPic"
+	"github.com/google/uuid"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -72,6 +74,12 @@ func (b *Bot) Start(ctx context.Context) {
 			b.cancel()
 			wg.Wait()
 			return
+		case "/settings":
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Goodbye!")
+			b.tg.Send(msg)
+			b.cancel()
+			wg.Wait()
+			return
 		default:
 			log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Generating a picture, please wait...")
@@ -79,7 +87,20 @@ func (b *Bot) Start(ctx context.Context) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				wsClient.SendMsgChan <- []byte(update.Message.Text)
+				hexUUID := uuid.New().String()
+				hexUUID = strings.ReplaceAll(hexUUID, "-", "")
+				msg := gp.Message{
+					PositivePrompt: string(update.Message.Text),
+					Model:          "runware:100@1@1",
+					Steps:          100,
+					Width:          512,
+					Height:         512,
+					NumberResults:  1,
+					OutputType:     []string{"URL"},
+					TaskType:       "imageInference",
+					TaskUUID:       hexUUID,
+				}
+				wsClient.SendMsgChan <- msg
 				select {
 				case response := <-wsClient.ReceiveMsgChan:
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, string(response))
