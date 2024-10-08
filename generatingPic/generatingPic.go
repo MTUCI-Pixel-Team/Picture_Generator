@@ -3,6 +3,7 @@ package generatingPic
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -127,7 +128,7 @@ func (ws *WSClient) sendPump(ctx context.Context) {
 			ws.socket.SetWriteDeadline(time.Now().Add(writeTimeout))
 			req := <-ws.SendMsgChan
 			reqData := []Message{req}
-
+			fmt.Println(reqData)
 			jsonMsg, err := json.Marshal(reqData)
 			if err != nil {
 				ws.ErrChan <- err
