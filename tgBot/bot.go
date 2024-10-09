@@ -7,11 +7,9 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 
 	gp "github.com/MTUCI-Pixel-Team/Picture_Generator/generatingPic"
-	"github.com/google/uuid"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -65,7 +63,7 @@ func NewBot(token string) (*Bot, error) {
 	}, nil
 }
 
-func (b *Bot) Start(ctx context.Context) {
+func (b *Bot) Start() {
 	log.Println("Bot is starting")
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -77,9 +75,9 @@ func (b *Bot) Start(ctx context.Context) {
 
 		b.userStates[update.Message.Chat.ID] = "done"
 
-		wsClient := gp.NewWSClient(os.Getenv("API_KEY2"))
+		wsClient := gp.NewWSClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 
-		go wsClient.Start(ctx)
+		go wsClient.Start()
 
 		log.Println("Client connetcted")
 
@@ -128,9 +126,7 @@ func (b *Bot) Start(ctx context.Context) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				hexUUID := uuid.New().String()
-				hexUUID = strings.ReplaceAll(hexUUID, "-", "")
-				msg := gp.Message{
+				msg := gp.ReqMessage{
 					PositivePrompt: string(update.Message.Text),
 					Model:          b.userSettings[update.Message.Chat.ID].model,
 					Steps:          b.userSettings[update.Message.Chat.ID].steps,
@@ -139,7 +135,7 @@ func (b *Bot) Start(ctx context.Context) {
 					NumberResults:  1,
 					OutputType:     []string{"URL"},
 					TaskType:       "imageInference",
-					TaskUUID:       hexUUID,
+					TaskUUID:       gp.GenerateUUID(),
 				}
 				wsClient.SendMsgChan <- msg
 				select {
