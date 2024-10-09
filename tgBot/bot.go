@@ -64,6 +64,8 @@ var sizeOptions = map[string][2]int{
 	"1024x1792 (9:16)": {1024, 1792},
 }
 
+var connectionUsers = make(map[int64]*gp.WSClient)
+
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
 		return nil, errors.New("token is empty")
@@ -96,7 +98,11 @@ func (b *Bot) Start() {
 	for update := range updates {
 		fmt.Println("update", update)
 
-		wsClient := gp.NewWSClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+		wsClient, exists := connectionUsers[update.Message.Chat.ID]
+		if !exists {
+			wsClient = gp.NewWSClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+			connectionUsers[update.Message.Chat.ID] = wsClient
+		}
 
 		go wsClient.Start()
 
