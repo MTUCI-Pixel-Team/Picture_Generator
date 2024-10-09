@@ -3,6 +3,7 @@ package generatingPic
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"strings"
@@ -161,7 +162,7 @@ func (ws *WSClient) sendPump() {
 			if err != nil {
 				ws.ErrChan <- err
 			}
-
+			fmt.Println(string(jsonMsg))
 			err = ws.socket.WriteMessage(websocket.TextMessage, jsonMsg)
 			if err != nil {
 				ws.ErrChan <- err
@@ -254,7 +255,6 @@ func (ws *WSClient) errorHandler() {
 }
 
 func (ws *WSClient) Close() {
-
 	select {
 	case <-ws.Done:
 		return
