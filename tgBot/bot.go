@@ -3,8 +3,9 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -161,8 +162,6 @@ func (b *Bot) Start(ctx context.Context) {
 					defer wg.Done()
 					hexUUID := uuid.New().String()
 					hexUUID = strings.ReplaceAll(hexUUID, "-", "")
-					fmt.Println("WIDTH", b.userSettings[update.Message.Chat.ID].width)
-					fmt.Println("HEIGTH", b.userSettings[update.Message.Chat.ID].heigth)
 					msg := gp.Message{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[update.Message.Chat.ID].model,
@@ -177,8 +176,41 @@ func (b *Bot) Start(ctx context.Context) {
 					wsClient.SendMsgChan <- msg
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
-						msg := tgbotapi.NewMessage(update.Message.Chat.ID, string(response))
-						b.tg.Send(msg)
+						imageURL := string(response) // Предполагается, что это URL изображения
+						// Загружаем изображение по URL
+						resp, err := http.Get(imageURL)
+						if err != nil {
+							// Обрабатываем ошибку, если не удалось загрузить изображение
+							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не удалось загрузить изображение")
+							b.tg.Send(msg)
+							return
+						}
+						defer resp.Body.Close()
+
+						// Читаем изображение из ответа
+						imageBytes, err := io.ReadAll(resp.Body)
+						if err != nil {
+							// Обрабатываем ошибку, если не удалось прочитать изображение
+							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Ошибка при обработке изображения")
+							b.tg.Send(msg)
+							return
+						}
+
+						// Создаем объект для отправки фото
+						photoFileBytes := tgbotapi.FileBytes{
+							Name:  "image",
+							Bytes: imageBytes,
+						}
+						photoMsg := tgbotapi.NewPhoto(update.Message.Chat.ID, photoFileBytes)
+
+						// Отправляем изображение пользователю
+						_, err = b.tg.Send(photoMsg)
+						if err != nil {
+							// Обрабатываем ошибку при отправке сообщения
+							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не удалось отправить изображение")
+							b.tg.Send(msg)
+							return
+						}
 					case err := <-wsClient.ErrChan:
 						log.Println(err)
 						msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Error occurred while generating a picture. Please try again or change your settings.")
