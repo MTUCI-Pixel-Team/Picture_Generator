@@ -34,10 +34,12 @@ type Bot struct {
 
 var (
 	defaultModel = "runware:100@1@1"
-	defaultSteps = 15
+	defaultSteps = 10
 	defaultSize  = [2]int{512, 512}
 	defaultState = "done"
 )
+
+var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size"}
 
 var modelsOptions = map[string]string{
 	"default":          "runware:100@1@1",
@@ -131,6 +133,9 @@ func (b *Bot) Start() {
 		switch {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
+			defaultKeyboard := getDefaultMarkup()
+
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			b.userSettings[chatID].state = "done"
 		case settings.state == "done" || settings.state == "":
@@ -138,15 +143,24 @@ func (b *Bot) Start() {
 			case "/start":
 				msg := tgbotapi.NewMessage(chatID,
 					"Hello! I'm a bot that can generate a picture for you. Just send me a message with a description of the picture you want to get. Description must be in English and be longer than 3 characters.")
-				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+				defaultKeyboard := getDefaultMarkup()
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 				// b.tg.StopReceivingUpdates()
 				// updates = b.tg.GetUpdatesChan(u)
 				// break
 			case "/help":
 				msg := tgbotapi.NewMessage(chatID,
-					"Available commands: \n/start - restart the bot \n/help - get help \n/models - list of all models for generate \n/steps - all variants of steps: More steps - better picture, but longer generation.\nTo generate a message, enter a description here.")
-				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+					"Available commands: \n"+
+						"/start - restart the bot \n"+
+						"/help - get help \n"+
+						"/models - list of all models for generate \n"+
+						"/steps - More steps - better, but longer generation\n"+
+						"/size - select size of the returned image\n"+
+						"/cancel - back to the start menu \n\n"+
+						"To generate a message, enter a description here.")
+				defaultKeyboard := getDefaultMarkup()
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 			case "/models":
 				b.settingsMutex.Lock()

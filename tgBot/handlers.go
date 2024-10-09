@@ -17,7 +17,7 @@ func handleSteps(b *Bot, message string, chatID int64) {
 	case settings.state == "showVariableSteps":
 
 		// Переходим к выбору количества шагов
-		text := fmt.Sprintf(`Your current settings steps: "%d" Please choose one from keyboard. More info in /help`, settings.steps)
+		text := fmt.Sprintf(`Your current settings steps: "%d" Please choose one from keyboard. Type /cancel if you want to return to the start menu `, settings.steps)
 		msg := tgbotapi.NewMessage(chatID, text)
 
 		keyboardSteps := getStepsMarkup()
@@ -57,7 +57,8 @@ func handleSteps(b *Bot, message string, chatID int64) {
 			b.userSettings[chatID].state = settings.state
 			b.settingsMutex.Unlock()
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Steps set to: %d", steps))
-			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			return
 		}
@@ -80,7 +81,7 @@ func handleModels(b *Bot, message string, chatID int64) {
 			}
 		}
 		// Переходим к выбору количества шагов
-		text := fmt.Sprintf(`Your model: "%s" Please choose one from keyboard. More info in /help`, modelName)
+		text := fmt.Sprintf(`Your model: "%s" Please choose one from keyboard. Type /cancel if you want to return to the start menu`, modelName)
 		msg := tgbotapi.NewMessage(chatID, text)
 		keyboard := getModelsMarkup()
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
@@ -103,7 +104,8 @@ func handleModels(b *Bot, message string, chatID int64) {
 			b.settingsMutex.Unlock()
 
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Model set to: %s", message))
-			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			return
 		} else if ok == 0 {
@@ -130,7 +132,7 @@ func handleSize(b *Bot, message string, chatID int64) {
 			fmt.Println("SIZE", value[0], value[1], settings.width, settings.heigth)
 		}
 		// Переходим к выбору количества шагов
-		text := fmt.Sprintf(`Your size: "%s" Please choose one from keyboard. More info in /help`, sizeName)
+		text := fmt.Sprintf(`Your size: "%s" Please choose one from keyboard. Type /cancel if you want to return to the start menus`, sizeName)
 		msg := tgbotapi.NewMessage(chatID, text)
 		keyboard := getSizeMarkup()
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
@@ -155,7 +157,8 @@ func handleSize(b *Bot, message string, chatID int64) {
 			b.settingsMutex.Unlock()
 
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Size set to: %s", message))
-			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			return
 		} else if ok == 0 {

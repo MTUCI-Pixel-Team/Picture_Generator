@@ -79,3 +79,23 @@ func getSizeMarkup() [][]tgbotapi.KeyboardButton {
 	}
 	return keyboard
 }
+
+func getDefaultMarkup() [][]tgbotapi.KeyboardButton {
+	var keyboard [][]tgbotapi.KeyboardButton
+
+	var row []tgbotapi.KeyboardButton
+	i := 0
+	for _, value := range serviceCommands {
+		button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%s", value))
+		row = append(row, button)
+
+		// Если добавили три кнопки в ряд, создаем новый ряд
+		if (i + 1) == 2 {
+			keyboard = append(keyboard, row)
+			row = []tgbotapi.KeyboardButton{} // Очищаем текущий ряд
+		}
+		i += 1
+	}
+	keyboard = append(keyboard, row)
+	return keyboard
+}
