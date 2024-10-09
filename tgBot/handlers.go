@@ -29,6 +29,19 @@ func handleSteps(b *Bot, message string, chatID int64) {
 		b.userSettings[chatID].state = settings.state
 		b.settingsMutex.Unlock()
 	case settings.state == "chooseSteps":
+		if message == "default" {
+			settings.steps = defaultSteps
+			settings.state = "done"
+			b.settingsMutex.Lock()
+			b.userSettings[chatID].steps = settings.steps
+			b.userSettings[chatID].state = settings.state
+			b.settingsMutex.Unlock()
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Steps set to: %d", defaultSteps))
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
+			b.tg.Send(msg)
+			return
+		}
 		// Строку в число (ascii to integer)
 		steps, err := strconv.Atoi(message)
 		if err != nil {
@@ -46,10 +59,7 @@ func handleSteps(b *Bot, message string, chatID int64) {
 				break
 			}
 		}
-		if !ok {
-			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a number from keyboard.")
-			b.tg.Send(msg)
-		} else {
+		if ok || steps == defaultSteps {
 			settings.steps = steps
 			settings.state = "done"
 			b.settingsMutex.Lock()
@@ -61,6 +71,9 @@ func handleSteps(b *Bot, message string, chatID int64) {
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			return
+		} else {
+			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a number from keyboard.")
+			b.tg.Send(msg)
 		}
 	}
 
@@ -97,7 +110,7 @@ func handleModels(b *Bot, message string, chatID int64) {
 				ok = 1
 			}
 		}
-		if ok == 1 {
+		if ok == 1 || modelsOptions[message] == defaultModel {
 			b.settingsMutex.Lock()
 			b.userSettings[chatID].model = modelsOptions[message]
 			b.userSettings[chatID].state = "done"
@@ -148,7 +161,7 @@ func handleSize(b *Bot, message string, chatID int64) {
 				ok = 1
 			}
 		}
-		if ok == 1 {
+		if ok == 1 || sizeOptions[message] == defaultSize {
 			b.settingsMutex.Lock()
 			fmt.Println("SIZE", sizeOptions[message][0], sizeOptions[message][1])
 			b.userSettings[chatID].width = sizeOptions[message][0]

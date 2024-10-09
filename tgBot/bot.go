@@ -53,17 +53,18 @@ var modelsOptions = map[string]string{
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
 
 var sizeOptions = map[string][2]int{
-	"1024x1024 (1:1)":  {1024, 1024},
-	"768x768 (1:1)":    {768, 768},
-	"2048x2048 (1:1)":  {2048, 2048},
-	"768x512 (3:2)":    {768, 512},
-	"1920x1280 (3:2)":  {1920, 1280},
-	"2048x1536 (4:3)":  {2048, 1536},
-	"1024x768 (4:3)":   {1024, 768},
-	"1536x2048 (3:4)":  {1536, 2048},
-	"768x1024 (3:4)":   {768, 1024},
-	"2048x1152 (16:9)": {2048, 1152},
-	"1024x1792 (9:16)": {1024, 1792},
+	"default 512x512 (1:1)": {512, 512},
+	"1024x1024 (1:1)":       {1024, 1024},
+	"768x768 (1:1)":         {768, 768},
+	"2048x2048 (1:1)":       {2048, 2048},
+	"768x512 (3:2)":         {768, 512},
+	"1920x1280 (3:2)":       {1920, 1280},
+	"2048x1536 (4:3)":       {2048, 1536},
+	"1024x768 (4:3)":        {1024, 768},
+	"1536x2048 (3:4)":       {1536, 2048},
+	"768x1024 (3:4)":        {768, 1024},
+	"2048x1152 (16:9)":      {2048, 1152},
+	"1024x1792 (9:16)":      {1024, 1792},
 }
 
 var connectionUsers = make(map[int64]*gp.WSClient)
@@ -134,7 +135,6 @@ func (b *Bot) Start() {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
 			defaultKeyboard := getDefaultMarkup()
-
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			b.userSettings[chatID].state = "done"
