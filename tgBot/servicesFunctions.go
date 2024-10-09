@@ -11,9 +11,13 @@ func getStepsMarkup() [][]tgbotapi.KeyboardButton {
 
 	var row []tgbotapi.KeyboardButton
 	for i, step := range stepsOptions {
-		button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%d", step))
-		row = append(row, button)
-
+		if step == defaultSteps {
+			button := tgbotapi.NewKeyboardButton("default")
+			row = append(row, button)
+		} else if step != defaultSteps {
+			button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%d", step))
+			row = append(row, button)
+		}
 		// Если добавили три кнопки в ряд, создаем новый ряд
 		if (i+1)%3 == 0 {
 			keyboard = append(keyboard, row)

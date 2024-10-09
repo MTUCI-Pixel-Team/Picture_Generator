@@ -33,6 +33,13 @@ type Bot struct {
 	settingsMutex sync.RWMutex
 }
 
+var (
+	defaultModel = "runware:100@1@1"
+	defaultSteps = 15
+	defaultSize  = [2]int{512, 512}
+	defaultState = "done"
+)
+
 var modelsOptions = map[string]string{
 	"default":          "runware:100@1@1",
 	"epicRealism":      "civitai:25694@143906",
@@ -42,7 +49,7 @@ var modelsOptions = map[string]string{
 	"FLUX":             "civitai:618692@691639",
 }
 
-var stepsOptions = []int{10, 20, 30, 50, 75, 100}
+var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
 
 var sizeOptions = map[string][2]int{
 	"1024x1024 (1:1)":  {1024, 1024},
@@ -107,15 +114,19 @@ func (b *Bot) Start(ctx context.Context) {
 		if !exists {
 			// По умолчанию
 			settings = &UserSettings{
-				steps:  15,
-				model:  "runware:100@1@1",
-				state:  "done",
-				heigth: 512,
-				width:  512,
+				steps:  defaultSteps,
+				model:  defaultModel,
+				state:  defaultState,
+				width:  defaultSize[0],
+				heigth: defaultSize[1],
 			}
 			b.userSettings[chatID] = settings
 		}
 		switch {
+		case update.Message.Text == "/cancel":
+			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
+			b.tg.Send(msg)
+			b.userSettings[chatID].state = "done"
 		case settings.state == "done" || settings.state == "":
 			switch update.Message.Text {
 			case "/start":
