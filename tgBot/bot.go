@@ -3,7 +3,6 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -102,7 +101,7 @@ func (b *Bot) Start() {
 
 	var wg sync.WaitGroup
 	for update := range updates {
-		fmt.Println("update", update)
+		// fmt.Println("update", update)
 
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {

@@ -154,7 +154,7 @@ func handleModels(b *Bot, message string, chatID int64) {
 	b.settingsMutex.Lock()
 	settings := b.userSettings[chatID]
 	b.settingsMutex.Unlock()
-	fmt.Println("STATE", settings.state)
+	// fmt.Println("STATE", settings.state)
 	switch settings.state {
 	case "showVariableModels":
 		modelName := ""
@@ -204,7 +204,6 @@ func handleSize(b *Bot, message string, chatID int64) {
 	b.settingsMutex.Lock()
 	settings := b.userSettings[chatID]
 	b.settingsMutex.Unlock()
-	fmt.Println("STATE", settings.state)
 	switch settings.state {
 	case "showVariableSize":
 		sizeName := ""
@@ -213,7 +212,6 @@ func handleSize(b *Bot, message string, chatID int64) {
 				sizeName = key
 				break
 			}
-			fmt.Println("SIZE", value[0], value[1], settings.width, settings.heigth)
 		}
 		// Переходим к выбору количества шагов
 		text := fmt.Sprintf(`Your size: "%s" Please choose one from keyboard. Type /cancel if you want to return to the start menus`, sizeName)
@@ -234,7 +232,6 @@ func handleSize(b *Bot, message string, chatID int64) {
 		}
 		if ok == 1 || sizeOptions[message] == defaultSize {
 			b.settingsMutex.Lock()
-			fmt.Println("SIZE", sizeOptions[message][0], sizeOptions[message][1])
 			b.userSettings[chatID].width = sizeOptions[message][0]
 			b.userSettings[chatID].heigth = sizeOptions[message][1]
 			b.userSettings[chatID].state = "done"
