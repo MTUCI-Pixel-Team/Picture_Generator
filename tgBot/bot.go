@@ -16,11 +16,12 @@ import (
 )
 
 type UserSettings struct {
-	steps  int
-	model  string
-	width  int
-	heigth int
-	state  string
+	steps         int
+	model         string
+	width         int
+	heigth        int
+	state         string
+	numberResults int
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -33,10 +34,11 @@ type Bot struct {
 }
 
 var (
-	defaultModel = "runware:100@1@1"
-	defaultSteps = 10
-	defaultSize  = [2]int{512, 512}
-	defaultState = "done"
+	defaultModel         = "runware:100@1@1"
+	defaultSteps         = 10
+	defaultSize          = [2]int{512, 512}
+	defaultState         = "done"
+	defaultNumberResults = 1
 )
 
 var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size"}
@@ -51,6 +53,7 @@ var modelsOptions = map[string]string{
 }
 
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
+var numberResultsOptions = []int{1, 2, 3, 4, 5, 10}
 
 var sizeOptions = map[string][2]int{
 	"default 512x512 (1:1)": {512, 512},
@@ -119,18 +122,19 @@ func (b *Bot) Start() {
 
 		b.settingsMutex.Lock()
 		settings, exists := b.userSettings[chatID]
-		b.settingsMutex.Unlock()
 		if !exists {
 			// По умолчанию
 			settings = &UserSettings{
-				steps:  defaultSteps,
-				model:  defaultModel,
-				state:  defaultState,
-				width:  defaultSize[0],
-				heigth: defaultSize[1],
+				steps:         defaultSteps,
+				model:         defaultModel,
+				state:         defaultState,
+				width:         defaultSize[0],
+				heigth:        defaultSize[1],
+				numberResults: defaultNumberResults,
 			}
 			b.userSettings[chatID] = settings
 		}
+		b.settingsMutex.Unlock()
 		switch {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
@@ -177,7 +181,11 @@ func (b *Bot) Start() {
 				b.userSettings[chatID].state = "showVariableSize"
 				b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
-
+			case "/numberResults":
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].state = "showVariableNumberResults"
+				b.settingsMutex.Unlock()
+				handleNumberResults(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 
@@ -191,17 +199,19 @@ func (b *Bot) Start() {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
+					b.settingsMutex.Lock()
 					msg := gp.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[update.Message.Chat.ID].model,
 						Steps:          b.userSettings[update.Message.Chat.ID].steps,
 						Width:          b.userSettings[update.Message.Chat.ID].width,
 						Height:         b.userSettings[update.Message.Chat.ID].heigth,
-						NumberResults:  1,
+						NumberResults:  b.userSettings[update.Message.Chat.ID].numberResults,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
 					}
+					b.settingsMutex.Unlock()
 					wsClient.SendMsgChan <- msg
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
@@ -254,6 +264,8 @@ func (b *Bot) Start() {
 			handleSteps(b, update.Message.Text, chatID)
 		case settings.state == "chooseSize":
 			handleSize(b, update.Message.Text, chatID)
+		case settings.state == "chooseNumberResults":
+			handleNumberResults(b, update.Message.Text, chatID)
 
 		}
 

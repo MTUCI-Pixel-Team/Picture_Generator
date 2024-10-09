@@ -79,6 +79,77 @@ func handleSteps(b *Bot, message string, chatID int64) {
 
 }
 
+func handleNumberResults(b *Bot, message string, chatID int64) {
+
+	b.settingsMutex.Lock()
+	settings := b.userSettings[chatID]
+	b.settingsMutex.Unlock()
+	switch {
+	case settings.state == "showVariableNumberResults":
+
+		// Переходим к выбору количества шагов
+		text := fmt.Sprintf(`Your current settings number results: "%d" Please choose one from keyboard. Type /cancel if you want to return to the start menu `, settings.numberResults)
+		msg := tgbotapi.NewMessage(chatID, text)
+
+		keyboardSteps := getNumberResultsMarkup()
+
+		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboardSteps...)
+		b.tg.Send(msg)
+		settings.state = "chooseNumberResults"
+		b.settingsMutex.Lock()
+		b.userSettings[chatID].state = settings.state
+		b.settingsMutex.Unlock()
+	case settings.state == "chooseNumberResults":
+		if message == "default" {
+			settings.numberResults = defaultNumberResults
+			settings.state = "done"
+			b.settingsMutex.Lock()
+			b.userSettings[chatID].numberResults = settings.numberResults
+			b.userSettings[chatID].state = settings.state
+			b.settingsMutex.Unlock()
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Number results set to: %d", defaultNumberResults))
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
+			b.tg.Send(msg)
+			return
+		}
+		// Строку в число (ascii to integer)
+		numberResults, err := strconv.Atoi(message)
+		if err != nil {
+			log.Println(err)
+			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please choose a number from keyboard:")
+			b.tg.Send(msg)
+			return
+		}
+
+		// Проверка на вхождение введенного числа в список доступных значений
+		ok := false
+		for _, v := range numberResultsOptions {
+			if v == numberResults {
+				ok = true
+				break
+			}
+		}
+		if ok || numberResults == defaultSteps {
+			settings.numberResults = numberResults
+			settings.state = "done"
+			b.settingsMutex.Lock()
+			b.userSettings[chatID].numberResults = settings.numberResults
+			b.userSettings[chatID].state = settings.state
+			b.settingsMutex.Unlock()
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Number results set to: %d", numberResults))
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
+			b.tg.Send(msg)
+			return
+		} else {
+			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a number from keyboard.")
+			b.tg.Send(msg)
+		}
+	}
+
+}
+
 func handleModels(b *Bot, message string, chatID int64) {
 	b.settingsMutex.Lock()
 	settings := b.userSettings[chatID]

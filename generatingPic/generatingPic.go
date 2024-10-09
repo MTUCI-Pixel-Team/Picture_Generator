@@ -181,6 +181,7 @@ func (ws *WSClient) receivePump() {
 
 			response := new(RespMessage)
 			err := ws.socket.ReadJSON(response)
+			fmt.Println(response)
 			if err != nil {
 				ws.ErrChan <- err
 			}

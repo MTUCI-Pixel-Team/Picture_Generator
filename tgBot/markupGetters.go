@@ -33,6 +33,32 @@ func getStepsMarkup() [][]tgbotapi.KeyboardButton {
 	return keyboard
 }
 
+func getNumberResultsMarkup() [][]tgbotapi.KeyboardButton {
+	var keyboard [][]tgbotapi.KeyboardButton
+
+	var row []tgbotapi.KeyboardButton
+	for i, numberResult := range numberResultsOptions {
+		if numberResult == defaultNumberResults {
+			button := tgbotapi.NewKeyboardButton("default")
+			row = append(row, button)
+		} else if numberResult != defaultNumberResults {
+			button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%d", numberResult))
+			row = append(row, button)
+		}
+		// Если добавили три кнопки в ряд, создаем новый ряд
+		if (i+1)%3 == 0 {
+			keyboard = append(keyboard, row)
+			row = []tgbotapi.KeyboardButton{} // Очищаем текущий ряд
+		}
+	}
+
+	// Добавляем оставшиеся кнопки, если они есть
+	if len(row) > 0 {
+		keyboard = append(keyboard, row)
+	}
+	return keyboard
+}
+
 func getModelsMarkup() [][]tgbotapi.KeyboardButton {
 	var keyboard [][]tgbotapi.KeyboardButton
 	var row []tgbotapi.KeyboardButton
