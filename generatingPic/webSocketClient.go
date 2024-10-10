@@ -28,65 +28,6 @@ const (
 	READ_TIMEOUT          = 30 * time.Second
 )
 
-type ReqMessage struct {
-	TaskType       string   `json:"taskType,omitempty"`
-	TaskUUID       string   `json:"taskUUID,omitempty"`
-	OutputType     []string `json:"outputType,omitempty"`
-	OutputFormat   string   `json:"outputFormat,omitempty"`
-	PositivePrompt string   `json:"positivePrompt,omitempty"`
-	NegativePrompt string   `json:"negativePrompt,omitempty"`
-	Height         int      `json:"height,omitempty"`
-	Width          int      `json:"width,omitempty"`
-	Model          string   `json:"model,omitempty"`
-	Steps          int      `json:"steps,omitempty"`
-	CFGScale       float64  `json:"CFGScale,omitempty"`
-	NumberResults  int      `json:"numberResults,omitempty"`
-	Scheduler      string   `json:"scheduler,omitempty"`
-	ApiKey         string   `json:"apiKey,omitempty"`
-}
-
-type RespData struct {
-	TaskType              string `json:"taskType"`
-	TaskUUID              string `json:"taskUUID"`
-	ImageUUID             string `json:"imageUUID"`
-	NSFWContent           bool   `json:"NSFWContent"`
-	ConnectionSessionUUID string `json:"connectionSessionUUID"`
-	ImageURL              string `json:"imageURL"`
-}
-
-type RespError struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	Parameter string `json:"parameter"`
-	Type      string `json:"type"`
-	TaskUUID  string `json:"taskUUID"`
-}
-
-type RespMessage struct {
-	Data []RespData  `json:"data"`
-	Err  []RespError `json:"errors"`
-}
-
-type WSClient struct {
-	User struct {
-		ID   uint
-		UUID string
-	}
-	url            string
-	apiKey         string
-	socket         *websocket.Conn
-	SendMsgChan    chan ReqMessage
-	ReceiveMsgChan chan []byte
-	ErrChan        chan error
-	Done           chan struct{}
-	CloseChan      chan struct{}
-	socketMutex    sync.Mutex
-	wg             sync.WaitGroup
-	reconnecting   atomic.Bool
-	closeOnce      sync.Once
-	closed         atomic.Bool
-}
-
 func NewWSClient(apiKey string, userID uint) *WSClient {
 	return &WSClient{
 		User: struct {
@@ -103,10 +44,18 @@ func NewWSClient(apiKey string, userID uint) *WSClient {
 }
 
 func (ws *WSClient) Start(ctx context.Context) {
-	ws.SendMsgChan = make(chan ReqMessage, SEND_CHAN_MAX_SIZE)
-	ws.ReceiveMsgChan = make(chan []byte, RECEIVE_CHAN_MAX_SIZE)
-	ws.ErrChan = make(chan error)
-	ws.Done = make(chan struct{})
+	if ws.SendMsgChan == nil {
+		ws.SendMsgChan = make(chan ReqMessage, SEND_CHAN_MAX_SIZE)
+	}
+	if ws.ReceiveMsgChan == nil {
+		ws.ReceiveMsgChan = make(chan []byte, RECEIVE_CHAN_MAX_SIZE)
+	}
+	if ws.ErrChan == nil {
+		ws.ErrChan = make(chan error)
+	}
+	if ws.Done == nil {
+		ws.Done = make(chan struct{})
+	}
 	ws.closed.Store(false)
 
 	ws.socketMutex.Lock()
@@ -143,15 +92,15 @@ func (ws *WSClient) connect(ctx context.Context) error {
 		TaskType: "authentication",
 		ApiKey:   ws.apiKey,
 	}
-	formattaedReq := []ReqMessage{authCredentials}
+	formattedReq := []ReqMessage{authCredentials}
 
-	jsnoStr, err := json.Marshal(formattaedReq)
+	jsonStr, err := json.Marshal(formattedReq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal auth request: %w", err)
 	}
-	fmt.Println(string(jsnoStr))
+	fmt.Println(string(jsonStr))
 
-	err = ws.socket.WriteMessage(websocket.TextMessage, jsnoStr)
+	err = ws.socket.WriteMessage(websocket.TextMessage, jsonStr)
 	if err != nil {
 		return fmt.Errorf("failed to send auth request: %w", err)
 	}
@@ -388,6 +337,10 @@ func (ws *WSClient) Close(ctx context.Context) error {
 
 		ctx.Done()
 
+		safeClose(ws.SendMsgChan)
+		safeClose(ws.ReceiveMsgChan)
+		safeClose(ws.ErrChan)
+
 		log.Println("WebSocket client shutdown completed")
 	})
 	return closeErr
@@ -453,6 +406,18 @@ func (ws *WSClient) SendMsg(msg ReqMessage, ctx context.Context) error {
 		return nil
 	default:
 		return errors.New("send channel is full")
+	}
+}
+
+func (ws *WSClient) ReceiveMsg(ctx context.Context) (string, error) {
+	select {
+	case <-ctx.Done():
+		return "", ctx.Err()
+	case msg, ok := <-ws.ReceiveMsgChan:
+		if !ok {
+			return "", errors.New("receive channel is closed")
+		}
+		return string(msg), nil
 	}
 }
 

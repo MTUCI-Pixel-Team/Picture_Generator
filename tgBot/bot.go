@@ -3,6 +3,7 @@ package tgBot
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -88,9 +89,7 @@ func NewBot(token string) (*Bot, error) {
 	}
 
 	return &Bot{
-		tg: tgBot,
-		// ctx:          ctx,
-		// cancel:       cancel,
+		tg:           tgBot,
 		userSettings: make(map[int64]*UserSettings), // Инициализируем карту
 	}, nil
 }
@@ -119,7 +118,7 @@ func (b *Bot) Start() {
 
 		chatID := update.Message.Chat.ID
 
-		b.settingsMutex.Lock()
+		// b.settingsMutex.Lock()
 		settings, exists := b.userSettings[chatID]
 		if !exists {
 			// По умолчанию
@@ -134,7 +133,7 @@ func (b *Bot) Start() {
 			}
 			b.userSettings[chatID] = settings
 		}
-		b.settingsMutex.Unlock()
+		// b.settingsMutex.Unlock()
 		if b.userSettings[chatID].generatingPicture {
 			msg := tgbotapi.NewMessage(chatID, "Please wait, the picture is being generated")
 			b.tg.Send(msg)
@@ -155,9 +154,6 @@ func (b *Bot) Start() {
 				defaultKeyboard := getDefaultMarkup()
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
-				// b.tg.StopReceivingUpdates()
-				// updates = b.tg.GetUpdatesChan(u)
-				// break
 			case "/help":
 				msg := tgbotapi.NewMessage(chatID,
 					"Available commands: \n"+
@@ -172,29 +168,29 @@ func (b *Bot) Start() {
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 			case "/models":
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableModels"
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				handleModels(b, update.Message.Text, chatID)
 			case "/steps":
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSteps"
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				handleSteps(b, update.Message.Text, chatID)
 			case "/size":
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSize"
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
 			case "/numberResults":
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableNumberResults"
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				handleNumberResults(b, update.Message.Text, chatID)
 			case "/schedulers":
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSchedulers"
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
@@ -209,14 +205,15 @@ func (b *Bot) Start() {
 				if er != nil {
 					log.Println(er)
 				}
-				b.settingsMutex.Lock()
+				// b.settingsMutex.Lock()
 				b.userSettings[chatID].generatingMsgId = botMsg.MessageID
-				b.settingsMutex.Unlock()
+				// b.settingsMutex.Unlock()
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					b.settingsMutex.Lock()
+					// b.settingsMutex.Lock()
 					b.userSettings[chatID].generatingPicture = true
+
 					msg := gp.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[chatID].model,
@@ -229,16 +226,18 @@ func (b *Bot) Start() {
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
 					}
+					// b.settingsMutex.Unlock()
 					wsClient.SendMsg(msg, context)
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
-						b.settingsMutex.Lock()
+						// b.settingsMutex.Lock()
 						b.userSettings[chatID].generatingPicture = false
 						deleteMsg := tgbotapi.DeleteMessageConfig{
 							ChatID:    chatID,
 							MessageID: b.userSettings[chatID].generatingMsgId,
 						}
-						b.settingsMutex.Unlock()
+						// b.settingsMutex.Unlock()
+
 						imageURL := string(response) // Предполагается, что это URL изображения
 						// Загружаем изображение по URL
 						resp, err := http.Get(imageURL)
@@ -248,6 +247,7 @@ func (b *Bot) Start() {
 							b.tg.Send(msg)
 							return
 						}
+						fmt.Println("str response", string(response))
 						defer resp.Body.Close()
 
 						// Читаем изображение из ответа
@@ -278,13 +278,13 @@ func (b *Bot) Start() {
 							return
 						}
 					case err := <-wsClient.ErrChan:
-						b.settingsMutex.Lock()
+						// b.settingsMutex.Lock()
 						b.userSettings[chatID].generatingPicture = false
 						deleteMsg := tgbotapi.DeleteMessageConfig{
 							ChatID:    chatID,
 							MessageID: b.userSettings[chatID].generatingMsgId,
 						}
-						b.settingsMutex.Unlock()
+						// b.settingsMutex.Unlock()
 						if _, err := b.tg.Request(deleteMsg); err != nil {
 							log.Printf("Failed to delete message: %v", err)
 						}
