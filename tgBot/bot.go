@@ -123,7 +123,7 @@ func (b *Bot) Start() {
 
 		chatID := update.Message.Chat.ID
 
-		// b.settingsMutex.Lock()
+		b.settingsMutex.Lock()
 		settings, exists := b.userSettings[chatID]
 		if !exists {
 			// По умолчанию
@@ -169,29 +169,29 @@ func (b *Bot) Start() {
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 			case "/models":
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableModels"
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				handleModels(b, update.Message.Text, chatID)
 			case "/steps":
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSteps"
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				handleSteps(b, update.Message.Text, chatID)
 			case "/size":
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSize"
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
 			case "/numberResults":
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableNumberResults"
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				handleNumberResults(b, update.Message.Text, chatID)
 			case "/schedulers":
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableSchedulers"
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
@@ -206,9 +206,9 @@ func (b *Bot) Start() {
 				if er != nil {
 					log.Println(er)
 				}
-				// b.settingsMutex.Lock()
+				b.settingsMutex.Lock()
 				b.userSettings[chatID].generatingMsgId = botMsg.MessageID
-				// b.settingsMutex.Unlock()
+				b.settingsMutex.Unlock()
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
@@ -283,7 +283,7 @@ func (b *Bot) Start() {
 							ChatID:    chatID,
 							MessageID: b.userSettings[chatID].generatingMsgId,
 						}
-						// b.settingsMutex.Unlock()
+						b.settingsMutex.Unlock()
 						if _, err := b.tg.Request(deleteMsg); err != nil {
 							log.Printf("Failed to delete message: %v", err)
 						}
