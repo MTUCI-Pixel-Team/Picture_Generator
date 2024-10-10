@@ -21,6 +21,7 @@ type UserSettings struct {
 	heigth        int
 	state         string
 	numberResults int
+	scheduler     string
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -38,9 +39,10 @@ var (
 	defaultSize          = [2]int{512, 512}
 	defaultState         = "done"
 	defaultNumberResults = 1
+	defaultScheduler     = "Default"
 )
 
-var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size"}
+var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/numberResults", "/schedulers"}
 
 var modelsOptions = map[string]string{
 	"default":          "runware:100@1@1",
@@ -53,6 +55,8 @@ var modelsOptions = map[string]string{
 
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
 var numberResultsOptions = []int{1, 2, 3, 4, 5, 10}
+
+var schedulersOptions = []string{"Default", "DDIMScheduler", "DEISMultistepScheduler", "HeunDiscreteScheduler", "KarrasVeScheduler", "DPM++ SDE"}
 
 var sizeOptions = map[string][2]int{
 	"default 512x512 (1:1)": {512, 512},
@@ -130,6 +134,7 @@ func (b *Bot) Start() {
 				width:         defaultSize[0],
 				heigth:        defaultSize[1],
 				numberResults: defaultNumberResults,
+				scheduler:     defaultScheduler,
 			}
 			b.userSettings[chatID] = settings
 		}
@@ -185,6 +190,11 @@ func (b *Bot) Start() {
 				b.userSettings[chatID].state = "showVariableNumberResults"
 				b.settingsMutex.Unlock()
 				handleNumberResults(b, update.Message.Text, chatID)
+			case "/schedulers":
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].state = "showVariableSchedulers"
+				b.settingsMutex.Unlock()
+				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 
@@ -206,6 +216,7 @@ func (b *Bot) Start() {
 						Width:          b.userSettings[update.Message.Chat.ID].width,
 						Height:         b.userSettings[update.Message.Chat.ID].heigth,
 						NumberResults:  b.userSettings[update.Message.Chat.ID].numberResults,
+						Scheduler:      b.userSettings[update.Message.Chat.ID].scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
@@ -265,6 +276,8 @@ func (b *Bot) Start() {
 			handleSize(b, update.Message.Text, chatID)
 		case settings.state == "chooseNumberResults":
 			handleNumberResults(b, update.Message.Text, chatID)
+		case settings.state == "chooseSchedulers":
+			handleSchedulers(b, update.Message.Text, chatID)
 
 		}
 

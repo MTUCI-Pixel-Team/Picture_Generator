@@ -249,3 +249,53 @@ func handleSize(b *Bot, message string, chatID int64) {
 
 	}
 }
+
+func handleSchedulers(b *Bot, message string, chatID int64) {
+	b.settingsMutex.Lock()
+	settings := b.userSettings[chatID]
+	b.settingsMutex.Unlock()
+	// fmt.Println("STATE", settings.state)
+	switch settings.state {
+	case "showVariableSchedulers":
+		schedulerName := ""
+		for _, value := range schedulersOptions {
+			if value == settings.scheduler {
+				schedulerName = value
+				break
+			}
+		}
+		// Переходим к выбору количества шагов
+		text := fmt.Sprintf(`Your scheduler: "%s" Please choose one from keyboard. Type /cancel if you want to return to the start menu`, schedulerName)
+		msg := tgbotapi.NewMessage(chatID, text)
+		keyboard := getSchedulersMarkup()
+		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
+		b.tg.Send(msg)
+		b.settingsMutex.Lock()
+		b.userSettings[chatID].state = "chooseSchedulers"
+		b.settingsMutex.Unlock()
+	case "chooseSchedulers":
+		// Проверка на вхождение введенной модели в список доступных значений
+		ok := 0
+		for _, value := range schedulersOptions {
+			if value == message {
+				ok = 1
+			}
+		}
+		if ok == 1 || message == defaultModel {
+			b.settingsMutex.Lock()
+			b.userSettings[chatID].scheduler = message
+			b.userSettings[chatID].state = "done"
+			b.settingsMutex.Unlock()
+
+			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Scheduler set to: %s", message))
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
+			b.tg.Send(msg)
+			return
+		} else if ok == 0 {
+			msg := tgbotapi.NewMessage(chatID, "Invalid input. Please enter a scheduler from keyboard.")
+			b.tg.Send(msg)
+		}
+
+	}
+}

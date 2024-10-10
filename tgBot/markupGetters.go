@@ -144,3 +144,33 @@ func getDefaultMarkup() [][]tgbotapi.KeyboardButton {
 	keyboard = append(keyboard, row)
 	return keyboard
 }
+
+func getSchedulersMarkup() [][]tgbotapi.KeyboardButton {
+	var keyboard [][]tgbotapi.KeyboardButton
+	var row []tgbotapi.KeyboardButton
+
+	// Создаем слайс для ключей и сортируем их
+	keys := schedulersOptions
+	sort.Strings(keys) // Сортируем ключи
+
+	// Генерация кнопок в нужном порядке
+	i := 0
+	for _, key := range keys {
+		button := tgbotapi.NewKeyboardButton(fmt.Sprintf("%s", key))
+		row = append(row, button)
+
+		// Добавляем ряд каждые три кнопки
+		if (i+1)%3 == 0 {
+			keyboard = append(keyboard, row)
+			row = []tgbotapi.KeyboardButton{} // Очищаем ряд
+		}
+		i++
+	}
+
+	// Добавляем оставшиеся кнопки, если есть
+	if len(row) > 0 {
+		keyboard = append(keyboard, row)
+	}
+
+	return keyboard
+}

@@ -42,6 +42,9 @@ type ReqMessage struct {
 	Steps          int      `json:"steps,omitempty"`
 	CFGScale       float64  `json:"CFGScale,omitempty"`
 	NumberResults  int      `json:"numberResults,omitempty"`
+	Scheduler      string   `json:"scheduler,omitempty"`
+	Seed           int      `json:"seed,omitempty"`
+	Name           string   `json:"name,omitempty"`
 }
 
 type RespData struct {
