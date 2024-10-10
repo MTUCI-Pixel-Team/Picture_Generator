@@ -41,6 +41,7 @@ type ReqMessage struct {
 	Steps          int      `json:"steps,omitempty"`
 	CFGScale       float64  `json:"CFGScale,omitempty"`
 	NumberResults  int      `json:"numberResults,omitempty"`
+	Scheduler      string   `json:"scheduler,omitempty"`
 	ApiKey         string   `json:"apiKey,omitempty"`
 }
 

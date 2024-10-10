@@ -15,11 +15,15 @@ import (
 )
 
 type UserSettings struct {
-	steps  int
-	model  string
-	width  int
-	heigth int
-	state  string
+	steps             int
+	model             string
+	width             int
+	heigth            int
+	state             string
+	numberResults     int
+	scheduler         string
+	generatingPicture bool
+	generatingMsgId   int
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -32,11 +36,15 @@ type Bot struct {
 }
 
 var (
-	defaultModel = "runware:100@1@1"
-	defaultSteps = 15
-	defaultSize  = [2]int{512, 512}
-	defaultState = "done"
+	defaultModel         = "runware:100@1@1"
+	defaultSteps         = 10
+	defaultSize          = [2]int{512, 512}
+	defaultState         = "done"
+	defaultNumberResults = 1
+	defaultScheduler     = "Default"
 )
+
+var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/numberResults", "/schedulers"}
 
 var modelsOptions = map[string]string{
 	"default":          "runware:100@1@1",
@@ -48,19 +56,23 @@ var modelsOptions = map[string]string{
 }
 
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
+var numberResultsOptions = []int{1, 2, 3, 4, 5, 10}
+
+var schedulersOptions = []string{"Default", "DDIMScheduler", "DEISMultistepScheduler", "HeunDiscreteScheduler", "KarrasVeScheduler", "DPM++ SDE"}
 
 var sizeOptions = map[string][2]int{
-	"1024x1024 (1:1)":  {1024, 1024},
-	"768x768 (1:1)":    {768, 768},
-	"2048x2048 (1:1)":  {2048, 2048},
-	"768x512 (3:2)":    {768, 512},
-	"1920x1280 (3:2)":  {1920, 1280},
-	"2048x1536 (4:3)":  {2048, 1536},
-	"1024x768 (4:3)":   {1024, 768},
-	"1536x2048 (3:4)":  {1536, 2048},
-	"768x1024 (3:4)":   {768, 1024},
-	"2048x1152 (16:9)": {2048, 1152},
-	"1024x1792 (9:16)": {1024, 1792},
+	"default 512x512 (1:1)": {512, 512},
+	"1024x1024 (1:1)":       {1024, 1024},
+	"768x768 (1:1)":         {768, 768},
+	"2048x2048 (1:1)":       {2048, 2048},
+	"768x512 (3:2)":         {768, 512},
+	"1920x1280 (3:2)":       {1920, 1280},
+	"2048x1536 (4:3)":       {2048, 1536},
+	"1024x768 (4:3)":        {1024, 768},
+	"1536x2048 (3:4)":       {1536, 2048},
+	"768x1024 (3:4)":        {768, 1024},
+	"2048x1152 (16:9)":      {2048, 1152},
+	"1024x1792 (9:16)":      {1024, 1792},
 }
 
 var connectionUsers = make(map[int64]*gp.WSClient)
@@ -109,21 +121,30 @@ func (b *Bot) Start() {
 
 		b.settingsMutex.Lock()
 		settings, exists := b.userSettings[chatID]
-		b.settingsMutex.Unlock()
 		if !exists {
 			// По умолчанию
 			settings = &UserSettings{
-				steps:  defaultSteps,
-				model:  defaultModel,
-				state:  defaultState,
-				width:  defaultSize[0],
-				heigth: defaultSize[1],
+				steps:         defaultSteps,
+				model:         defaultModel,
+				state:         defaultState,
+				width:         defaultSize[0],
+				heigth:        defaultSize[1],
+				numberResults: defaultNumberResults,
+				scheduler:     defaultScheduler,
 			}
 			b.userSettings[chatID] = settings
+		}
+		b.settingsMutex.Unlock()
+		if b.userSettings[chatID].generatingPicture {
+			msg := tgbotapi.NewMessage(chatID, "Please wait, the picture is being generated")
+			b.tg.Send(msg)
+			continue
 		}
 		switch {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
+			defaultKeyboard := getDefaultMarkup()
+			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
 			b.userSettings[chatID].state = "done"
 		case settings.state == "done" || settings.state == "":
@@ -131,15 +152,24 @@ func (b *Bot) Start() {
 			case "/start":
 				msg := tgbotapi.NewMessage(chatID,
 					"Hello! I'm a bot that can generate a picture for you. Just send me a message with a description of the picture you want to get. Description must be in English and be longer than 3 characters.")
-				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+				defaultKeyboard := getDefaultMarkup()
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 				// b.tg.StopReceivingUpdates()
 				// updates = b.tg.GetUpdatesChan(u)
 				// break
 			case "/help":
 				msg := tgbotapi.NewMessage(chatID,
-					"Available commands: \n/start - restart the bot \n/help - get help \n/models - list of all models for generate \n/steps - all variants of steps: More steps - better picture, but longer generation.\nTo generate a message, enter a description here.")
-				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+					"Available commands: \n"+
+						"/start - restart the bot \n"+
+						"/help - get help \n"+
+						"/models - list of all models for generate \n"+
+						"/steps - More steps - better, but longer generation\n"+
+						"/size - select size of the returned image\n"+
+						"/cancel - back to the start menu \n\n"+
+						"To generate a message, enter a description here.")
+				defaultKeyboard := getDefaultMarkup()
+				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 			case "/models":
 				b.settingsMutex.Lock()
@@ -156,27 +186,45 @@ func (b *Bot) Start() {
 				b.userSettings[chatID].state = "showVariableSize"
 				b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
-
+			case "/numberResults":
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].state = "showVariableNumberResults"
+				b.settingsMutex.Unlock()
+				handleNumberResults(b, update.Message.Text, chatID)
+			case "/schedulers":
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].state = "showVariableSchedulers"
+				b.settingsMutex.Unlock()
+				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 
 				if len(update.Message.Text) < 3 {
-					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Description must be longer than 3 characters.")
+					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 3 characters.")
 					b.tg.Send(msg)
 					continue
 				}
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Generating a picture, please wait...")
-				b.tg.Send(msg)
+				msg := tgbotapi.NewMessage(chatID, "Generating a picture, please wait...")
+				botMsg, er := b.tg.Send(msg)
+				if er != nil {
+					log.Println(er)
+				}
+				b.settingsMutex.Lock()
+				b.userSettings[chatID].generatingMsgId = botMsg.MessageID
+				b.settingsMutex.Unlock()
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
+					b.settingsMutex.Lock()
+					b.userSettings[chatID].generatingPicture = true
 					msg := gp.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
-						Model:          b.userSettings[update.Message.Chat.ID].model,
-						Steps:          b.userSettings[update.Message.Chat.ID].steps,
-						Width:          b.userSettings[update.Message.Chat.ID].width,
-						Height:         b.userSettings[update.Message.Chat.ID].heigth,
-						NumberResults:  1,
+						Model:          b.userSettings[chatID].model,
+						Steps:          b.userSettings[chatID].steps,
+						Width:          b.userSettings[chatID].width,
+						Height:         b.userSettings[chatID].heigth,
+						NumberResults:  b.userSettings[chatID].numberResults,
+						Scheduler:      b.userSettings[chatID].scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
@@ -184,12 +232,19 @@ func (b *Bot) Start() {
 					wsClient.SendMsg(msg, context)
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
+						b.settingsMutex.Lock()
+						b.userSettings[chatID].generatingPicture = false
+						deleteMsg := tgbotapi.DeleteMessageConfig{
+							ChatID:    chatID,
+							MessageID: b.userSettings[chatID].generatingMsgId,
+						}
+						b.settingsMutex.Unlock()
 						imageURL := string(response) // Предполагается, что это URL изображения
 						// Загружаем изображение по URL
 						resp, err := http.Get(imageURL)
 						if err != nil {
 							// Обрабатываем ошибку, если не удалось загрузить изображение
-							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не удалось загрузить изображение")
+							msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
 							b.tg.Send(msg)
 							return
 						}
@@ -199,7 +254,7 @@ func (b *Bot) Start() {
 						imageBytes, err := io.ReadAll(resp.Body)
 						if err != nil {
 							// Обрабатываем ошибку, если не удалось прочитать изображение
-							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Ошибка при обработке изображения")
+							msg := tgbotapi.NewMessage(chatID, "Ошибка при обработке изображения")
 							b.tg.Send(msg)
 							return
 						}
@@ -209,19 +264,32 @@ func (b *Bot) Start() {
 							Name:  "image",
 							Bytes: imageBytes,
 						}
-						photoMsg := tgbotapi.NewPhoto(update.Message.Chat.ID, photoFileBytes)
+						photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
 
 						// Отправляем изображение пользователю
 						_, err = b.tg.Send(photoMsg)
+						if _, err := b.tg.Request(deleteMsg); err != nil {
+							log.Printf("Failed to delete message: %v", err)
+						}
 						if err != nil {
 							// Обрабатываем ошибку при отправке сообщения
-							msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не удалось отправить изображение")
+							msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
 							b.tg.Send(msg)
 							return
 						}
 					case err := <-wsClient.ErrChan:
+						b.settingsMutex.Lock()
+						b.userSettings[chatID].generatingPicture = false
+						deleteMsg := tgbotapi.DeleteMessageConfig{
+							ChatID:    chatID,
+							MessageID: b.userSettings[chatID].generatingMsgId,
+						}
+						b.settingsMutex.Unlock()
+						if _, err := b.tg.Request(deleteMsg); err != nil {
+							log.Printf("Failed to delete message: %v", err)
+						}
 						log.Println(err)
-						msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Error occurred while generating a picture. Please try again or change your settings.")
+						msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 						b.tg.Send(msg)
 					}
 				}()
@@ -233,6 +301,10 @@ func (b *Bot) Start() {
 			handleSteps(b, update.Message.Text, chatID)
 		case settings.state == "chooseSize":
 			handleSize(b, update.Message.Text, chatID)
+		case settings.state == "chooseNumberResults":
+			handleNumberResults(b, update.Message.Text, chatID)
+		case settings.state == "chooseSchedulers":
+			handleSchedulers(b, update.Message.Text, chatID)
 
 		}
 
