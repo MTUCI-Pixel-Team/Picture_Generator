@@ -3,7 +3,6 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -76,12 +75,10 @@ func NewBot(token string) (*Bot, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-
 	return &Bot{
-		tg:           tgBot,
-		ctx:          ctx,
-		cancel:       cancel,
+		tg: tgBot,
+		// ctx:          ctx,
+		// cancel:       cancel,
 		userSettings: make(map[int64]*UserSettings), // Инициализируем карту
 	}, nil
 }
@@ -96,17 +93,13 @@ func (b *Bot) Start() {
 
 	var wg sync.WaitGroup
 	for update := range updates {
-		fmt.Println("update", update)
-
+		context, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
 			wsClient = gp.NewWSClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
-
-		go wsClient.Start()
-
-		log.Println("Client connetcted")
 
 		if update.Message == nil {
 			continue
@@ -170,7 +163,7 @@ func (b *Bot) Start() {
 				if len(update.Message.Text) < 3 {
 					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Description must be longer than 3 characters.")
 					b.tg.Send(msg)
-					return
+					continue
 				}
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Generating a picture, please wait...")
 				b.tg.Send(msg)
@@ -188,7 +181,7 @@ func (b *Bot) Start() {
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
 					}
-					wsClient.SendMsgChan <- msg
+					wsClient.SendMsg(msg, context)
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
 						imageURL := string(response) // Предполагается, что это URL изображения
