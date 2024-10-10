@@ -16,15 +16,14 @@ import (
 )
 
 type UserSettings struct {
-	steps             int
-	model             string
-	width             int
-	heigth            int
-	state             string
-	numberResults     int
-	scheduler         string
-	generatingPicture bool
-	generatingMsgId   int
+	steps           int
+	model           string
+	width           int
+	heigth          int
+	state           string
+	numberResults   int
+	scheduler       string
+	generatingMsgId int
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -88,8 +87,12 @@ func NewBot(token string) (*Bot, error) {
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &Bot{
 		tg:           tgBot,
+		ctx:          ctx,
+		cancel:       cancel,
 		userSettings: make(map[int64]*UserSettings), // Инициализируем карту
 	}, nil
 }
@@ -104,13 +107,15 @@ func (b *Bot) Start() {
 
 	var wg sync.WaitGroup
 	for update := range updates {
-		context, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		// fmt.Println("update", update)
+
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
 			wsClient = gp.NewWSClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
+
+		log.Println("Client connetcted")
 
 		if update.Message == nil {
 			continue
@@ -133,12 +138,8 @@ func (b *Bot) Start() {
 			}
 			b.userSettings[chatID] = settings
 		}
-		// b.settingsMutex.Unlock()
-		if b.userSettings[chatID].generatingPicture {
-			msg := tgbotapi.NewMessage(chatID, "Please wait, the picture is being generated")
-			b.tg.Send(msg)
-			continue
-		}
+		b.settingsMutex.Unlock()
+		fmt.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 		switch {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
@@ -198,7 +199,7 @@ func (b *Bot) Start() {
 				if len(update.Message.Text) < 3 {
 					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 3 characters.")
 					b.tg.Send(msg)
-					continue
+					return
 				}
 				msg := tgbotapi.NewMessage(chatID, "Generating a picture, please wait...")
 				botMsg, er := b.tg.Send(msg)
@@ -211,9 +212,8 @@ func (b *Bot) Start() {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					// b.settingsMutex.Lock()
-					b.userSettings[chatID].generatingPicture = true
-
+					b.settingsMutex.Lock()
+					b.userSettings[chatID].state = "generatingPicture"
 					msg := gp.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[chatID].model,
@@ -226,18 +226,10 @@ func (b *Bot) Start() {
 						TaskType:       "imageInference",
 						TaskUUID:       gp.GenerateUUID(),
 					}
-					// b.settingsMutex.Unlock()
-					wsClient.SendMsg(msg, context)
+					b.settingsMutex.Unlock()
+					wsClient.SendMsg(msg, b.ctx)
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
-						// b.settingsMutex.Lock()
-						b.userSettings[chatID].generatingPicture = false
-						deleteMsg := tgbotapi.DeleteMessageConfig{
-							ChatID:    chatID,
-							MessageID: b.userSettings[chatID].generatingMsgId,
-						}
-						// b.settingsMutex.Unlock()
-
 						imageURL := string(response) // Предполагается, что это URL изображения
 						// Загружаем изображение по URL
 						resp, err := http.Get(imageURL)
@@ -268,18 +260,25 @@ func (b *Bot) Start() {
 
 						// Отправляем изображение пользователю
 						_, err = b.tg.Send(photoMsg)
-						if _, err := b.tg.Request(deleteMsg); err != nil {
-							log.Printf("Failed to delete message: %v", err)
-						}
 						if err != nil {
 							// Обрабатываем ошибку при отправке сообщения
 							msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
 							b.tg.Send(msg)
 							return
 						}
+						b.settingsMutex.Lock()
+						b.userSettings[chatID].state = "done"
+						deleteMsg := tgbotapi.DeleteMessageConfig{
+							ChatID:    chatID,
+							MessageID: b.userSettings[chatID].generatingMsgId,
+						}
+						b.settingsMutex.Unlock()
+						if _, err := b.tg.Request(deleteMsg); err != nil {
+							log.Printf("Failed to delete message: %v", err)
+						}
 					case err := <-wsClient.ErrChan:
-						// b.settingsMutex.Lock()
-						b.userSettings[chatID].generatingPicture = false
+						b.settingsMutex.Lock()
+						b.userSettings[chatID].state = "done"
 						deleteMsg := tgbotapi.DeleteMessageConfig{
 							ChatID:    chatID,
 							MessageID: b.userSettings[chatID].generatingMsgId,
@@ -295,6 +294,9 @@ func (b *Bot) Start() {
 				}()
 
 			}
+		case settings.state == "generatingPicture":
+			msg := tgbotapi.NewMessage(chatID, "Please wait, the picture is being generated")
+			b.tg.Send(msg)
 		case settings.state == "chooseModels":
 			handleModels(b, update.Message.Text, chatID)
 		case settings.state == "chooseSteps":
