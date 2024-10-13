@@ -47,12 +47,14 @@ var (
 var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/numberResults", "/schedulers"}
 
 var modelsOptions = map[string]string{
-	"default":          "runware:100@1@1",
-	"epicRealism":      "civitai:25694@143906",
-	"2DN Pony":         "civitai:520661@933040",
-	"JuggernautXL":     "civitai:133005@782002",
-	"Realistic vision": "civitai:4201@501240",
-	"FLUX":             "civitai:618692@691639",
+	"default":               "runware:100@1@1",
+	"epicRealism":           "civitai:25694@143906",
+	"JuggernautXL":          "civitai:133005@782002",
+	"Realistic vision":      "civitai:4201@501240",
+	"Realistic vision V6.0": "civitai:4201@501240",
+	"Dream Shaper":          "civitai:4384@128713",
+	"ReV Animated":          "civitai:7371@425083",
+	"FLUX":                  "civitai:618692@691639",
 }
 
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
@@ -202,7 +204,7 @@ func (b *Bot) Start() {
 				if len(update.Message.Text) < 3 {
 					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 3 characters.")
 					b.tg.Send(msg)
-					return
+					continue
 				}
 				msg := tgbotapi.NewMessage(chatID, "Generating a picture, please wait...")
 				botMsg, er := b.tg.Send(msg)
@@ -234,13 +236,13 @@ func (b *Bot) Start() {
 					select {
 					case response := <-wsClient.ReceiveMsgChan:
 						imageURL := string(response) // Предполагается, что это URL изображения
+
 						// Загружаем изображение по URL
 						resp, err := http.Get(imageURL)
 						if err != nil {
 							// Обрабатываем ошибку, если не удалось загрузить изображение
 							msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
 							b.tg.Send(msg)
-							return
 						}
 						defer resp.Body.Close()
 
@@ -250,7 +252,6 @@ func (b *Bot) Start() {
 							// Обрабатываем ошибку, если не удалось прочитать изображение
 							msg := tgbotapi.NewMessage(chatID, "Ошибка при обработке изображения")
 							b.tg.Send(msg)
-							return
 						}
 
 						// Создаем объект для отправки фото
@@ -266,7 +267,6 @@ func (b *Bot) Start() {
 							// Обрабатываем ошибку при отправке сообщения
 							msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
 							b.tg.Send(msg)
-							return
 						}
 						b.settingsMutex.Lock()
 						b.userSettings[chatID].state = "done"
@@ -309,6 +309,8 @@ func (b *Bot) Start() {
 			handleNumberResults(b, update.Message.Text, chatID)
 		case settings.state == "chooseSchedulers":
 			handleSchedulers(b, update.Message.Text, chatID)
+		default:
+			fmt.Println("1")
 
 		}
 
