@@ -36,8 +36,7 @@ func main() {
 	// 		TaskUUID:       gp.GenerateUUID(),
 	// 	}
 	// 	fmt.Println("Sending message", i)
-	// 	go c.SendMsg(msg, context)
-	// 	// c.SendMsgChan <- msg
+	// 	c.SendMsg(msg, context)
 	// 	fmt.Println("Message sent", i)
 	// 	resp, ok := <-c.ReceiveMsgChan
 	// 	if !ok {

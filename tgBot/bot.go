@@ -157,9 +157,6 @@ func (b *Bot) Start() {
 				defaultKeyboard := getDefaultMarkup()
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
-				// b.tg.StopReceivingUpdates()
-				// updates = b.tg.GetUpdatesChan(u)
-				// break
 			case "/help":
 				msg := tgbotapi.NewMessage(chatID,
 					"Available commands: \n"+
@@ -244,6 +241,7 @@ func (b *Bot) Start() {
 							msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
 							b.tg.Send(msg)
 						}
+						fmt.Println("str response", string(response))
 						defer resp.Body.Close()
 
 						// Читаем изображение из ответа
