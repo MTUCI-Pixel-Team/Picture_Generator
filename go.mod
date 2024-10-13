@@ -9,4 +9,7 @@ require (
 	golang.org/x/net v0.30.0
 )
 
-require github.com/google/uuid v1.6.0 // indirect
+require (
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/prorok210/WS_Client-for_runware.ai- v1.1.1 // indirect
+)
