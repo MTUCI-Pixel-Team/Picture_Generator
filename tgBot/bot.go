@@ -109,8 +109,11 @@ func (b *Bot) Start() {
 
 	var wg sync.WaitGroup
 	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
 		// fmt.Println("update", update)
-
+		fmt.Println("update.Message", update.Message.Chat.ID)
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
 			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
@@ -165,8 +168,8 @@ func (b *Bot) Start() {
 						"/models - list of all models for generate \n"+
 						"/steps - More steps - better, but longer generation\n"+
 						"/size - select size of the returned image\n"+
-                        "/number_result - select the number of generated images\n"+
-                        "/schedulers - select the prototype of generation\n"+
+						"/number_result - select the number of generated images\n"+
+						"/schedulers - select the prototype of generation\n"+
 						"/cancel - back to the start menu \n\n"+
 						"To generate a message, enter a description here.")
 				defaultKeyboard := getDefaultMarkup()
