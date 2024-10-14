@@ -44,7 +44,7 @@ var (
 	defaultScheduler     = "Default"
 )
 
-var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/numberResults", "/schedulers"}
+var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/number_results", "/schedulers"}
 
 var modelsOptions = map[string]string{
 	"default":               "runware:100@1@1",
@@ -165,6 +165,8 @@ func (b *Bot) Start() {
 						"/models - list of all models for generate \n"+
 						"/steps - More steps - better, but longer generation\n"+
 						"/size - select size of the returned image\n"+
+                        "/number_result - select the number of generated images\n"+
+                        "/schedulers - select the prototype of generation\n"+
 						"/cancel - back to the start menu \n\n"+
 						"To generate a message, enter a description here.")
 				defaultKeyboard := getDefaultMarkup()
@@ -185,7 +187,7 @@ func (b *Bot) Start() {
 				b.userSettings[chatID].state = "showVariableSize"
 				b.settingsMutex.Unlock()
 				handleSize(b, update.Message.Text, chatID)
-			case "/numberResults":
+			case "/number_results":
 				b.settingsMutex.Lock()
 				b.userSettings[chatID].state = "showVariableNumberResults"
 				b.settingsMutex.Unlock()
