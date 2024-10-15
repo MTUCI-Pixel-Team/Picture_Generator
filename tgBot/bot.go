@@ -9,6 +9,8 @@ import (
 	"os"
 	"sync"
 
+	pg "github.com/prorok210/WS_Client-for_runware.ai-"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -74,7 +76,7 @@ var sizeOptions = map[string][2]int{
 	"1024x1792 (9:16)":      {1024, 1792},
 }
 
-var connectionUsers = make(map[int64]*WSClient)
+var connectionUsers = make(map[int64]*pg.WSClient)
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -111,7 +113,7 @@ func (b *Bot) Start() {
 		}
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
-			wsClient = CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
 
@@ -151,7 +153,7 @@ func (b *Bot) Start() {
 			switch update.Message.Text {
 			case "/start":
 				msg := tgbotapi.NewMessage(chatID,
-					"Hello! I'm a bot that can generate a picture for you. Just send me a message with a description of the picture you want to get. Description must be in English and be longer than 3 characters.")
+					"Hello! I'm a bot that can generate a picture for you. Just send me a message with a description of the picture you want to get. Description must be in English and be longer than 2 characters.")
 				defaultKeyboard := getDefaultMarkup()
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
@@ -199,7 +201,7 @@ func (b *Bot) Start() {
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 
 				if len(update.Message.Text) < 3 {
-					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 3 characters.")
+					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 2 characters.")
 					b.tg.Send(msg)
 					continue
 				}
@@ -228,7 +230,7 @@ func (b *Bot) Start() {
 					}()
 					b.settingsMutex.Lock()
 					b.userSettings[chatID].state = "generatingPicture"
-					msg := ReqMessage{
+					msg := pg.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[chatID].model,
 						Steps:          b.userSettings[chatID].steps,
@@ -238,7 +240,7 @@ func (b *Bot) Start() {
 						Scheduler:      b.userSettings[chatID].scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
-						TaskUUID:       GenerateUUID(),
+						TaskUUID:       pg.GenerateUUID(),
 					}
 					b.settingsMutex.Unlock()
 					response, err := wsClient.SendAndReceiveMsg(msg)
