@@ -247,8 +247,25 @@ func (b *Bot) Start() {
 						msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 						b.tg.Send(msg)
 					} else {
+
 						log.Println("RESPONSE", response)
-						imageURL := string(response[0].ImageURL)
+						responseData, responseErr := response.Data, response.Err
+						if responseErr != nil {
+							b.settingsMutex.Lock()
+							b.userSettings[chatID].state = "done"
+							deleteMsg := tgbotapi.DeleteMessageConfig{
+								ChatID:    chatID,
+								MessageID: b.userSettings[chatID].generatingMsgId,
+							}
+							b.settingsMutex.Unlock()
+							if _, err := b.tg.Request(deleteMsg); err != nil {
+								log.Printf("Failed to delete message: %v", err)
+							}
+							log.Println(responseErr)
+							msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
+							b.tg.Send(msg)
+						}
+						imageURL := string(responseData[0].ImageURL)
 
 						// Загружаем изображение по URL
 						resp, err := http.Get(imageURL)

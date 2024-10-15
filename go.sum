@@ -6,7 +6,5 @@ github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aN
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/prorok210/WS_Client-for_runware.ai- v1.1.1 h1:xUXetjEtALE02/vEx/cU4Ougfjsr0UIP3Jv40zPoiTQ=
-github.com/prorok210/WS_Client-for_runware.ai- v1.1.1/go.mod h1:oNe8/CXT9wmfGmmGQfPvMjhgk9heVMmTnFgwfDI9ypU=
-golang.org/x/net v0.30.0 h1:AcW1SDZMkb8IpzCdQUaIq2sP4sZ4zw+55h6ynffypl4=
-golang.org/x/net v0.30.0/go.mod h1:2wGyMJ5iFasEhkwi13ChkO/t1ECNC4X4eBKkVFyYFlU=
+github.com/prorok210/WS_Client-for_runware.ai- v1.1.2-0.20241014203918-5eb651b2b323 h1:JkpcPj11W4RvWFl5uesf4uEMmxHVPli6OtjwueYASAg=
+github.com/prorok210/WS_Client-for_runware.ai- v1.1.2-0.20241014203918-5eb651b2b323/go.mod h1:oNe8/CXT9wmfGmmGQfPvMjhgk9heVMmTnFgwfDI9ypU=
