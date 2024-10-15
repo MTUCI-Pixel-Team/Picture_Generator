@@ -3,13 +3,12 @@ package tgBot
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"sync"
-
-	pg "github.com/prorok210/WS_Client-for_runware.ai-"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -76,7 +75,7 @@ var sizeOptions = map[string][2]int{
 	"1024x1792 (9:16)":      {1024, 1792},
 }
 
-var connectionUsers = make(map[int64]*pg.WSClient)
+var connectionUsers = make(map[int64]*WSClient)
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -113,7 +112,7 @@ func (b *Bot) Start() {
 		}
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
-			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+			wsClient = CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
 
@@ -216,9 +215,21 @@ func (b *Bot) Start() {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
+					defer func() {
+						b.settingsMutex.Lock()
+						b.userSettings[chatID].state = "done"
+						deleteMsg := tgbotapi.DeleteMessageConfig{
+							ChatID:    chatID,
+							MessageID: b.userSettings[chatID].generatingMsgId,
+						}
+						b.settingsMutex.Unlock()
+						if _, err := b.tg.Request(deleteMsg); err != nil {
+							log.Printf("Failed to delete message: %v", err)
+						}
+					}()
 					b.settingsMutex.Lock()
 					b.userSettings[chatID].state = "generatingPicture"
-					msg := pg.ReqMessage{
+					msg := ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          b.userSettings[chatID].model,
 						Steps:          b.userSettings[chatID].steps,
@@ -228,85 +239,63 @@ func (b *Bot) Start() {
 						Scheduler:      b.userSettings[chatID].scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
-						TaskUUID:       pg.GenerateUUID(),
+						TaskUUID:       GenerateUUID(),
 					}
 					b.settingsMutex.Unlock()
 					response, err := wsClient.SendAndReceiveMsg(msg)
 					if err != nil {
-						b.settingsMutex.Lock()
-						b.userSettings[chatID].state = "done"
-						deleteMsg := tgbotapi.DeleteMessageConfig{
-							ChatID:    chatID,
-							MessageID: b.userSettings[chatID].generatingMsgId,
-						}
-						b.settingsMutex.Unlock()
-						if _, err := b.tg.Request(deleteMsg); err != nil {
-							log.Printf("Failed to delete message: %v", err)
-						}
-						log.Println(err)
+						log.Printf("Recieve message error: %s", err)
 						msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 						b.tg.Send(msg)
 					} else {
+						log.Println("RESPONSE", response, len(response))
 
-						log.Println("RESPONSE", response)
-						responseData, responseErr := response.Data, response.Err
-						if responseErr != nil {
-							b.settingsMutex.Lock()
-							b.userSettings[chatID].state = "done"
-							deleteMsg := tgbotapi.DeleteMessageConfig{
-								ChatID:    chatID,
-								MessageID: b.userSettings[chatID].generatingMsgId,
-							}
-							b.settingsMutex.Unlock()
-							if _, err := b.tg.Request(deleteMsg); err != nil {
-								log.Printf("Failed to delete message: %v", err)
-							}
-							log.Println(responseErr)
+						if response == nil || len(response) == 0 || len(response[0].Data) == 0 {
+							log.Println("nil response")
 							msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 							b.tg.Send(msg)
+							return
 						}
-						imageURL := string(responseData[0].ImageURL)
+						for _, responseData := range response {
+							if len(responseData.Err) > 0 {
+								log.Println("Error response", responseData.Err)
+								msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
+								b.tg.Send(msg)
+								return
+							}
+							fmt.Println("RD", responseData)
+							imageURL := string(responseData.Data[0].ImageURL)
 
-						// Загружаем изображение по URL
-						resp, err := http.Get(imageURL)
-						if err != nil {
-							// Обрабатываем ошибку, если не удалось загрузить изображение
-							msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
-							b.tg.Send(msg)
-						}
-						defer resp.Body.Close()
+							// Загружаем изображение по URL
+							resp, err := http.Get(imageURL)
+							if err != nil {
+								// Обрабатываем ошибку, если не удалось загрузить изображение
+								msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
+								b.tg.Send(msg)
+							}
 
-						// Читаем изображение из ответа
-						imageBytes, err := io.ReadAll(resp.Body)
-						if err != nil {
-							// Обрабатываем ошибку, если не удалось прочитать изображение
-							msg := tgbotapi.NewMessage(chatID, "Ошибка при обработке изображения")
-							b.tg.Send(msg)
-						}
+							// Читаем изображение из ответа
+							imageBytes, err := io.ReadAll(resp.Body)
+							if err != nil {
+								// Обрабатываем ошибку, если не удалось прочитать изображение
+								msg := tgbotapi.NewMessage(chatID, "Ошибка при обработке изображения")
+								b.tg.Send(msg)
+							}
 
-						// Создаем объект для отправки фото
-						photoFileBytes := tgbotapi.FileBytes{
-							Name:  "image",
-							Bytes: imageBytes,
-						}
-						photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
+							// Создаем объект для отправки фото
+							photoFileBytes := tgbotapi.FileBytes{
+								Name:  "image",
+								Bytes: imageBytes,
+							}
+							photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
 
-						// Отправляем изображение пользователю
-						_, err = b.tg.Send(photoMsg)
-						if err != nil {
-							// Обрабатываем ошибку при отправке сообщения
-							msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
-							b.tg.Send(msg)
-						}
-						b.settingsMutex.Lock()
-						b.userSettings[chatID].state = "done"
-						deleteMsg := tgbotapi.DeleteMessageConfig{
-							ChatID:    chatID,
-							MessageID: b.userSettings[chatID].generatingMsgId,
-						}
-						b.settingsMutex.Unlock()
-						if _, err := b.tg.Request(deleteMsg); err != nil {
-							log.Printf("Failed to delete message: %v", err)
+							// Отправляем изображение пользователю
+							_, err = b.tg.Send(photoMsg)
+							if err != nil {
+								// Обрабатываем ошибку при отправке сообщения
+								msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
+								b.tg.Send(msg)
+							}
 						}
 					}
 				}()
