@@ -3,7 +3,6 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -263,7 +262,6 @@ func (b *Bot) Start() {
 								b.tg.Send(msg)
 								return
 							}
-							fmt.Println("RD", responseData)
 							imageURL := string(responseData.Data[0].ImageURL)
 
 							// Загружаем изображение по URL
