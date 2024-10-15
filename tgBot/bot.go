@@ -3,7 +3,6 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -112,8 +111,6 @@ func (b *Bot) Start() {
 		if update.Message == nil {
 			continue
 		}
-		// fmt.Println("update", update)
-		fmt.Println("update.Message", update.Message.Chat.ID)
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
 			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
@@ -144,7 +141,7 @@ func (b *Bot) Start() {
 			b.userSettings[chatID] = settings
 		}
 		b.settingsMutex.Unlock()
-		fmt.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
+		log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 		switch {
 		case update.Message.Text == "/cancel":
 			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
@@ -250,7 +247,7 @@ func (b *Bot) Start() {
 						msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 						b.tg.Send(msg)
 					} else {
-						fmt.Println("RESPONSE", response)
+						log.Println("RESPONSE", response)
 						imageURL := string(response[0].ImageURL)
 
 						// Загружаем изображение по URL
@@ -311,8 +308,6 @@ func (b *Bot) Start() {
 			handleNumberResults(b, update.Message.Text, chatID)
 		case settings.state == "chooseSchedulers":
 			handleSchedulers(b, update.Message.Text, chatID)
-		default:
-			fmt.Println("1")
 
 		}
 
