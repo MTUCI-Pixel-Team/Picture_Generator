@@ -9,7 +9,7 @@ import (
 	"os"
 	"sync"
 
-	pg "github.com/prorok210/WS_Client-for_runware.ai-"
+	// pg "github.com/prorok210/WS_Client-for_runware.ai-"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -27,11 +27,10 @@ type UserSettings struct {
 }
 
 type Bot struct {
-	tg            *tgbotapi.BotAPI
-	ctx           context.Context
-	cancel        context.CancelFunc
-	userSettings  map[int64]*UserSettings // Ключ — это ChatID пользователя, а значение — его настройки
-	settingsMutex sync.RWMutex
+	tg           *tgbotapi.BotAPI
+	ctx          context.Context
+	cancel       context.CancelFunc
+	userSettings sync.Map
 }
 
 var (
@@ -76,7 +75,7 @@ var sizeOptions = map[string][2]int{
 	"1024x1792 (9:16)":      {1024, 1792},
 }
 
-var connectionUsers = make(map[int64]*pg.WSClient)
+var connectionUsers = make(map[int64]*WSClient)
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -94,7 +93,7 @@ func NewBot(token string) (*Bot, error) {
 		tg:           tgBot,
 		ctx:          ctx,
 		cancel:       cancel,
-		userSettings: make(map[int64]*UserSettings), // Инициализируем карту
+		userSettings: sync.Map{}, // Инициализируем карту
 	}, nil
 }
 
@@ -113,7 +112,7 @@ func (b *Bot) Start() {
 		}
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
-			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+			wsClient = CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
 
@@ -125,11 +124,10 @@ func (b *Bot) Start() {
 
 		chatID := update.Message.Chat.ID
 
-		b.settingsMutex.Lock()
-		settings, exists := b.userSettings[chatID]
+		loadSettings, exists := b.userSettings.Load(chatID)
 		if !exists {
 			// По умолчанию
-			settings = &UserSettings{
+			loadSettings = &UserSettings{
 				steps:         defaultSteps,
 				model:         defaultModel,
 				state:         defaultState,
@@ -138,9 +136,8 @@ func (b *Bot) Start() {
 				numberResults: defaultNumberResults,
 				scheduler:     defaultScheduler,
 			}
-			b.userSettings[chatID] = settings
 		}
-		b.settingsMutex.Unlock()
+		settings := loadSettings.(*UserSettings)
 		log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 		switch {
 		case update.Message.Text == "/cancel":
@@ -148,7 +145,7 @@ func (b *Bot) Start() {
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
-			b.userSettings[chatID].state = "done"
+			settings.state = "done"
 		case settings.state == "done" || settings.state == "":
 			switch update.Message.Text {
 			case "/start":
@@ -173,29 +170,19 @@ func (b *Bot) Start() {
 				msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 				b.tg.Send(msg)
 			case "/models":
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].state = "showVariableModels"
-				b.settingsMutex.Unlock()
+				settings.state = "showVariableModels"
 				handleModels(b, update.Message.Text, chatID)
 			case "/steps":
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].state = "showVariableSteps"
-				b.settingsMutex.Unlock()
+				settings.state = "showVariableSteps"
 				handleSteps(b, update.Message.Text, chatID)
 			case "/size":
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].state = "showVariableSize"
-				b.settingsMutex.Unlock()
+				settings.state = "showVariableSize"
 				handleSize(b, update.Message.Text, chatID)
 			case "/number_results":
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].state = "showVariableNumberResults"
-				b.settingsMutex.Unlock()
+				settings.state = "showVariableNumberResults"
 				handleNumberResults(b, update.Message.Text, chatID)
 			case "/schedulers":
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].state = "showVariableSchedulers"
-				b.settingsMutex.Unlock()
+				settings.state = "showVariableSchedulers"
 				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
@@ -210,39 +197,33 @@ func (b *Bot) Start() {
 				if er != nil {
 					log.Println(er)
 				}
-				b.settingsMutex.Lock()
-				b.userSettings[chatID].generatingMsgId = botMsg.MessageID
-				b.settingsMutex.Unlock()
+				settings.generatingMsgId = botMsg.MessageID
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
 					defer func() {
-						b.settingsMutex.Lock()
-						b.userSettings[chatID].state = "done"
+						settings.state = "done"
 						deleteMsg := tgbotapi.DeleteMessageConfig{
 							ChatID:    chatID,
-							MessageID: b.userSettings[chatID].generatingMsgId,
+							MessageID: settings.generatingMsgId,
 						}
-						b.settingsMutex.Unlock()
 						if _, err := b.tg.Request(deleteMsg); err != nil {
 							log.Printf("Failed to delete message: %v", err)
 						}
 					}()
-					b.settingsMutex.Lock()
-					b.userSettings[chatID].state = "generatingPicture"
-					msg := pg.ReqMessage{
+					settings.state = "generatingPicture"
+					msg := ReqMessage{
 						PositivePrompt: string(update.Message.Text),
-						Model:          b.userSettings[chatID].model,
-						Steps:          b.userSettings[chatID].steps,
-						Width:          b.userSettings[chatID].width,
-						Height:         b.userSettings[chatID].heigth,
-						NumberResults:  b.userSettings[chatID].numberResults,
-						Scheduler:      b.userSettings[chatID].scheduler,
+						Model:          settings.model,
+						Steps:          settings.steps,
+						Width:          settings.width,
+						Height:         settings.heigth,
+						NumberResults:  settings.numberResults,
+						Scheduler:      settings.scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
-						TaskUUID:       pg.GenerateUUID(),
+						TaskUUID:       GenerateUUID(),
 					}
-					b.settingsMutex.Unlock()
 					response, err := wsClient.SendAndReceiveMsg(msg)
 					if err != nil {
 						log.Printf("Recieve message error: %s", err)
@@ -314,9 +295,8 @@ func (b *Bot) Start() {
 			handleNumberResults(b, update.Message.Text, chatID)
 		case settings.state == "chooseSchedulers":
 			handleSchedulers(b, update.Message.Text, chatID)
-
 		}
-
+		b.userSettings.Store(chatID, settings)
 	}
 	wg.Wait()
 	return

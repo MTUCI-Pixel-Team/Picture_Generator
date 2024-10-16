@@ -10,9 +10,8 @@ import (
 
 func handleSteps(b *Bot, message string, chatID int64) {
 
-	b.settingsMutex.Lock()
-	settings := b.userSettings[chatID]
-	b.settingsMutex.Unlock()
+	loadSettings, _ := b.userSettings.Load(chatID)
+	settings := loadSettings.(*UserSettings)
 	switch {
 	case settings.state == "showVariableSteps":
 
@@ -25,17 +24,13 @@ func handleSteps(b *Bot, message string, chatID int64) {
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboardSteps...)
 		b.tg.Send(msg)
 		settings.state = "chooseSteps"
-		b.settingsMutex.Lock()
-		b.userSettings[chatID].state = settings.state
-		b.settingsMutex.Unlock()
+		settings.state = settings.state
 	case settings.state == "chooseSteps":
 		if message == "default" {
 			settings.steps = defaultSteps
 			settings.state = "done"
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].steps = settings.steps
-			b.userSettings[chatID].state = settings.state
-			b.settingsMutex.Unlock()
+			settings.steps = settings.steps
+			settings.state = settings.state
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Steps set to: %d", defaultSteps))
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
@@ -62,10 +57,8 @@ func handleSteps(b *Bot, message string, chatID int64) {
 		if ok || steps == defaultSteps {
 			settings.steps = steps
 			settings.state = "done"
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].steps = settings.steps
-			b.userSettings[chatID].state = settings.state
-			b.settingsMutex.Unlock()
+			settings.steps = settings.steps
+			settings.state = settings.state
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Steps set to: %d", steps))
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
@@ -76,14 +69,14 @@ func handleSteps(b *Bot, message string, chatID int64) {
 			b.tg.Send(msg)
 		}
 	}
+	b.userSettings.Store(chatID, settings)
 
 }
 
 func handleNumberResults(b *Bot, message string, chatID int64) {
 
-	b.settingsMutex.Lock()
-	settings := b.userSettings[chatID]
-	b.settingsMutex.Unlock()
+	loadSettings, _ := b.userSettings.Load(chatID)
+	settings := loadSettings.(*UserSettings)
 	switch {
 	case settings.state == "showVariableNumberResults":
 
@@ -96,17 +89,13 @@ func handleNumberResults(b *Bot, message string, chatID int64) {
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboardSteps...)
 		b.tg.Send(msg)
 		settings.state = "chooseNumberResults"
-		b.settingsMutex.Lock()
-		b.userSettings[chatID].state = settings.state
-		b.settingsMutex.Unlock()
+		settings.state = settings.state
 	case settings.state == "chooseNumberResults":
 		if message == "default" {
 			settings.numberResults = defaultNumberResults
 			settings.state = "done"
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].numberResults = settings.numberResults
-			b.userSettings[chatID].state = settings.state
-			b.settingsMutex.Unlock()
+			settings.numberResults = settings.numberResults
+			settings.state = settings.state
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Number results set to: %d", defaultNumberResults))
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
@@ -133,10 +122,8 @@ func handleNumberResults(b *Bot, message string, chatID int64) {
 		if ok || numberResults == defaultSteps {
 			settings.numberResults = numberResults
 			settings.state = "done"
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].numberResults = settings.numberResults
-			b.userSettings[chatID].state = settings.state
-			b.settingsMutex.Unlock()
+			settings.numberResults = settings.numberResults
+			settings.state = settings.state
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Number results set to: %d", numberResults))
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
@@ -147,13 +134,13 @@ func handleNumberResults(b *Bot, message string, chatID int64) {
 			b.tg.Send(msg)
 		}
 	}
+	b.userSettings.Store(chatID, settings)
 
 }
 
 func handleModels(b *Bot, message string, chatID int64) {
-	b.settingsMutex.Lock()
-	settings := b.userSettings[chatID]
-	b.settingsMutex.Unlock()
+	loadSettings, _ := b.userSettings.Load(chatID)
+	settings := loadSettings.(*UserSettings)
 	// fmt.Println("STATE", settings.state)
 	switch settings.state {
 	case "showVariableModels":
@@ -170,9 +157,7 @@ func handleModels(b *Bot, message string, chatID int64) {
 		keyboard := getModelsMarkup()
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
 		b.tg.Send(msg)
-		b.settingsMutex.Lock()
-		b.userSettings[chatID].state = "chooseModels"
-		b.settingsMutex.Unlock()
+		settings.state = "chooseModels"
 	case "chooseModels":
 		// Проверка на вхождение введенной модели в список доступных значений
 		ok := 0
@@ -182,10 +167,8 @@ func handleModels(b *Bot, message string, chatID int64) {
 			}
 		}
 		if ok == 1 || modelsOptions[message] == defaultModel {
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].model = modelsOptions[message]
-			b.userSettings[chatID].state = "done"
-			b.settingsMutex.Unlock()
+			settings.model = modelsOptions[message]
+			settings.state = "done"
 
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Model set to: %s", message))
 			defaultKeyboard := getDefaultMarkup()
@@ -198,12 +181,12 @@ func handleModels(b *Bot, message string, chatID int64) {
 		}
 
 	}
+	b.userSettings.Store(chatID, settings)
 }
 
 func handleSize(b *Bot, message string, chatID int64) {
-	b.settingsMutex.Lock()
-	settings := b.userSettings[chatID]
-	b.settingsMutex.Unlock()
+	loadSettings, _ := b.userSettings.Load(chatID)
+	settings := loadSettings.(*UserSettings)
 	switch settings.state {
 	case "showVariableSize":
 		sizeName := ""
@@ -219,9 +202,7 @@ func handleSize(b *Bot, message string, chatID int64) {
 		keyboard := getSizeMarkup()
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
 		b.tg.Send(msg)
-		b.settingsMutex.Lock()
-		b.userSettings[chatID].state = "chooseSize"
-		b.settingsMutex.Unlock()
+		settings.state = "chooseSize"
 	case "chooseSize":
 		// Проверка на вхождение введенной модели в список доступных значений
 		ok := 0
@@ -231,11 +212,9 @@ func handleSize(b *Bot, message string, chatID int64) {
 			}
 		}
 		if ok == 1 || sizeOptions[message] == defaultSize {
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].width = sizeOptions[message][0]
-			b.userSettings[chatID].heigth = sizeOptions[message][1]
-			b.userSettings[chatID].state = "done"
-			b.settingsMutex.Unlock()
+			settings.width = sizeOptions[message][0]
+			settings.heigth = sizeOptions[message][1]
+			settings.state = "done"
 
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Size set to: %s", message))
 			defaultKeyboard := getDefaultMarkup()
@@ -248,12 +227,12 @@ func handleSize(b *Bot, message string, chatID int64) {
 		}
 
 	}
+	b.userSettings.Store(chatID, settings)
 }
 
 func handleSchedulers(b *Bot, message string, chatID int64) {
-	b.settingsMutex.Lock()
-	settings := b.userSettings[chatID]
-	b.settingsMutex.Unlock()
+	loadSettings, _ := b.userSettings.Load(chatID)
+	settings := loadSettings.(*UserSettings)
 	// fmt.Println("STATE", settings.state)
 	switch settings.state {
 	case "showVariableSchedulers":
@@ -270,9 +249,7 @@ func handleSchedulers(b *Bot, message string, chatID int64) {
 		keyboard := getSchedulersMarkup()
 		msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(keyboard...)
 		b.tg.Send(msg)
-		b.settingsMutex.Lock()
-		b.userSettings[chatID].state = "chooseSchedulers"
-		b.settingsMutex.Unlock()
+		settings.state = "chooseSchedulers"
 	case "chooseSchedulers":
 		// Проверка на вхождение введенной модели в список доступных значений
 		ok := 0
@@ -282,10 +259,8 @@ func handleSchedulers(b *Bot, message string, chatID int64) {
 			}
 		}
 		if ok == 1 || message == defaultModel {
-			b.settingsMutex.Lock()
-			b.userSettings[chatID].scheduler = message
-			b.userSettings[chatID].state = "done"
-			b.settingsMutex.Unlock()
+			settings.scheduler = message
+			settings.state = "done"
 
 			msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("Scheduler set to: %s", message))
 			defaultKeyboard := getDefaultMarkup()
@@ -298,4 +273,5 @@ func handleSchedulers(b *Bot, message string, chatID int64) {
 		}
 
 	}
+	b.userSettings.Store(chatID, settings)
 }
