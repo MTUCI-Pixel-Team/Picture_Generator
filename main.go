@@ -10,15 +10,15 @@ import (
 )
 
 func main() {
-	// file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	// if err != nil {
-	// 	log.Fatalf("Не удалось открыть файл для логов: %v", err)
-	// }
-	// defer file.Close()
+	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Не удалось открыть файл для логов: %v", err)
+	}
+	defer file.Close()
 
-	// // Настраиваем логгер на запись в файл
-	// log.SetOutput(file)
-	err := godotenv.Load()
+	// Настраиваем логгер на запись в файл
+	log.SetOutput(file)
+	err = godotenv.Load()
 	if err != nil {
 		log.Panic(err)
 	}

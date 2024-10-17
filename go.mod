@@ -10,5 +10,5 @@ require (
 require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/prorok210/WS_Client-for_runware.ai- v1.2.1 // indirect
+	github.com/prorok210/WS_Client-for_runware.ai- v1.2.3 // indirect
 )

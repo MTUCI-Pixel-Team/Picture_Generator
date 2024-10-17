@@ -3,14 +3,13 @@ package tgBot
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
-	// pg "github.com/prorok210/WS_Client-for_runware.ai-"
+	pg "github.com/prorok210/WS_Client-for_runware.ai-"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -76,7 +75,7 @@ var sizeOptions = map[string][2]int{
 	"1024x1792 (9:16)":      {1024, 1792},
 }
 
-var connectionUsers = make(map[int64]*WSClient)
+var connectionUsers = make(map[int64]*pg.WSClient)
 
 func NewBot(token string) (*Bot, error) {
 	if token == "" {
@@ -113,7 +112,7 @@ func (b *Bot) Start() {
 		}
 		wsClient, exists := connectionUsers[update.Message.Chat.ID]
 		if !exists {
-			wsClient = CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
+			wsClient = pg.CreateWsClient(os.Getenv("API_KEY2"), uint(update.Message.Chat.ID))
 			connectionUsers[update.Message.Chat.ID] = wsClient
 		}
 
@@ -225,11 +224,12 @@ func (b *Bot) Start() {
 						if _, err := b.tg.Request(deleteMsg); err != nil {
 							log.Printf("Failed to delete message: %v", err)
 						}
-						wsClient.dataInChannel.Store(false)
+
+						wsClient.DataInChannel.Store(false)
 					}()
 					settings.state = "generatingPicture"
 					b.userSettings.Store(chatID, settings)
-					msg := ReqMessage{
+					msg := pg.ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          settings.model,
 						Steps:          settings.steps,
@@ -239,7 +239,7 @@ func (b *Bot) Start() {
 						Scheduler:      settings.scheduler,
 						OutputType:     []string{"URL"},
 						TaskType:       "imageInference",
-						TaskUUID:       GenerateUUID(),
+						TaskUUID:       pg.GenerateUUID(),
 					}
 					response, err := wsClient.SendAndReceiveMsg(msg)
 					if err != nil {
@@ -269,7 +269,7 @@ func (b *Bot) Start() {
 
 							resp, err := http.Get(imageURL)
 							if err != nil {
-								fmt.Println(err)
+								log.Println(err)
 								msg := tgbotapi.NewMessage(chatID, "Failed to load image in tgChat")
 								b.tg.Send(msg)
 								return
@@ -278,7 +278,7 @@ func (b *Bot) Start() {
 
 							imageBytes, err := io.ReadAll(resp.Body)
 							if err != nil {
-								fmt.Println(err)
+								log.Println(err)
 								msg := tgbotapi.NewMessage(chatID, "Error while processing image")
 								b.tg.Send(msg)
 								return
