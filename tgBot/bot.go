@@ -3,6 +3,7 @@ package tgBot
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -136,6 +137,7 @@ func (b *Bot) Start() {
 				numberResults: defaultNumberResults,
 				scheduler:     defaultScheduler,
 			}
+			b.userSettings.Store(chatID, loadSettings)
 		}
 		settings := loadSettings.(*UserSettings)
 		log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
@@ -145,8 +147,9 @@ func (b *Bot) Start() {
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
-			settings.state = "done"
-		case settings.state == "done" || settings.state == "":
+			settings.state = "waitingGenerate"
+			b.userSettings.Store(chatID, settings)
+		case settings.state == "done" || settings.state == "" || settings.state == "waitingGenerate":
 			switch update.Message.Text {
 			case "/start":
 				msg := tgbotapi.NewMessage(chatID,
@@ -171,22 +174,31 @@ func (b *Bot) Start() {
 				b.tg.Send(msg)
 			case "/models":
 				settings.state = "showVariableModels"
+				b.userSettings.Store(chatID, settings)
 				handleModels(b, update.Message.Text, chatID)
 			case "/steps":
 				settings.state = "showVariableSteps"
+				b.userSettings.Store(chatID, settings)
 				handleSteps(b, update.Message.Text, chatID)
 			case "/size":
 				settings.state = "showVariableSize"
+				b.userSettings.Store(chatID, settings)
 				handleSize(b, update.Message.Text, chatID)
 			case "/number_results":
 				settings.state = "showVariableNumberResults"
+				b.userSettings.Store(chatID, settings)
 				handleNumberResults(b, update.Message.Text, chatID)
 			case "/schedulers":
 				settings.state = "showVariableSchedulers"
+				b.userSettings.Store(chatID, settings)
 				handleSchedulers(b, update.Message.Text, chatID)
 			default:
-				log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
-
+				// log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
+				if settings.state == "waitingGenerate" {
+					msg := tgbotapi.NewMessage(chatID, "Please choose a command from the keyboard while waiting for the generation to complete.")
+					b.tg.Send(msg)
+					continue
+				}
 				if len(update.Message.Text) < 3 {
 					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 2 characters.")
 					b.tg.Send(msg)
@@ -196,13 +208,16 @@ func (b *Bot) Start() {
 				botMsg, er := b.tg.Send(msg)
 				if er != nil {
 					log.Println(er)
+					continue
 				}
 				settings.generatingMsgId = botMsg.MessageID
+				b.userSettings.Store(chatID, settings)
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
 					defer func() {
 						settings.state = "done"
+						b.userSettings.Store(chatID, settings)
 						deleteMsg := tgbotapi.DeleteMessageConfig{
 							ChatID:    chatID,
 							MessageID: settings.generatingMsgId,
@@ -210,8 +225,10 @@ func (b *Bot) Start() {
 						if _, err := b.tg.Request(deleteMsg); err != nil {
 							log.Printf("Failed to delete message: %v", err)
 						}
+						wsClient.dataInChannel.Store(false)
 					}()
 					settings.state = "generatingPicture"
+					b.userSettings.Store(chatID, settings)
 					msg := ReqMessage{
 						PositivePrompt: string(update.Message.Text),
 						Model:          settings.model,
@@ -229,6 +246,7 @@ func (b *Bot) Start() {
 						log.Printf("Recieve message error: %s", err)
 						msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
 						b.tg.Send(msg)
+						return
 					} else {
 						log.Println("RESPONSE", response, len(response))
 
@@ -251,16 +269,20 @@ func (b *Bot) Start() {
 							resp, err := http.Get(imageURL)
 							if err != nil {
 								// Обрабатываем ошибку, если не удалось загрузить изображение
-								msg := tgbotapi.NewMessage(chatID, "Не удалось загрузить изображение")
+								fmt.Println(err)
+								msg := tgbotapi.NewMessage(chatID, "Failed to load image in tgChat")
 								b.tg.Send(msg)
+								return
 							}
 
 							// Читаем изображение из ответа
 							imageBytes, err := io.ReadAll(resp.Body)
 							if err != nil {
 								// Обрабатываем ошибку, если не удалось прочитать изображение
-								msg := tgbotapi.NewMessage(chatID, "Ошибка при обработке изображения")
+								fmt.Println(err)
+								msg := tgbotapi.NewMessage(chatID, "Error while processing image")
 								b.tg.Send(msg)
+								return
 							}
 
 							// Создаем объект для отправки фото
@@ -276,6 +298,7 @@ func (b *Bot) Start() {
 								// Обрабатываем ошибку при отправке сообщения
 								msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
 								b.tg.Send(msg)
+								return
 							}
 						}
 					}
@@ -296,7 +319,6 @@ func (b *Bot) Start() {
 		case settings.state == "chooseSchedulers":
 			handleSchedulers(b, update.Message.Text, chatID)
 		}
-		b.userSettings.Store(chatID, settings)
 	}
 	wg.Wait()
 	return

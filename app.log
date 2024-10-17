@@ -16,3 +16,340 @@
 2024/10/15 13:13:29 User: zdesbyli asked: pict
 2024/10/15 13:13:40 UserID: 1444225833 authenticated with UUID:113e3e9e-5339-4683-8b51-825e4ee7712c
 2024/10/15 13:13:42 RESPONSE {[{imageInference ee5859a388ae4167b17ab1fa83c90297 f969bb9c-ce0f-4ba6-ab7c-368e34be343d false  https://im.runware.ai/image/ws/0.5/ii/f969bb9c-ce0f-4ba6-ab7c-368e34be343d.jpg}] []}
+2024/10/15 16:43:08 Bot is starting
+2024/10/15 16:43:23 Client connetcted
+2024/10/15 16:43:23 User: zdesbyli asked: /start
+2024/10/15 16:43:26 Client connetcted
+2024/10/15 16:43:26 User: zdesbyli asked: /number_results
+2024/10/15 16:43:27 Client connetcted
+2024/10/15 16:43:27 User: zdesbyli asked: 2
+2024/10/15 16:43:29 Client connetcted
+2024/10/15 16:43:29 User: zdesbyli asked: pict
+2024/10/15 16:43:29 User: zdesbyli asked: pict
+2024/10/15 16:43:40 UserID: 1444225833 authenticated with UUID:52ce67d5-ed88-434f-87c8-d0817f1a88cd
+2024/10/15 16:44:32 timeout waiting for response
+2024/10/15 16:44:40 Error: Connection timeout
+2024/10/15 17:49:59 Bot is starting
+2024/10/15 17:50:26 Client connetcted
+2024/10/15 17:50:26 User: zdesbyli asked: /start
+2024/10/15 17:50:27 Client connetcted
+2024/10/15 17:50:27 User: zdesbyli asked: /number_results
+2024/10/15 17:50:27 Client connetcted
+2024/10/15 17:50:27 User: zdesbyli asked: 2
+2024/10/15 17:50:29 Client connetcted
+2024/10/15 17:50:29 User: zdesbyli asked: pict
+2024/10/15 17:50:29 User: zdesbyli asked: pict
+2024/10/15 17:50:40 UserID: 1444225833 authenticated with UUID:86da6449-627d-4bdb-b919-ab4e686196b1
+2024/10/15 17:50:42 RESPONSE [{[{imageInference ffcf4590b2bc41a09b91cc5518113aff 1271b80a-210d-4276-b475-204773b3da8a false  https://im.runware.ai/image/ws/0.5/ii/1271b80a-210d-4276-b475-204773b3da8a.jpg}] []} {[{imageInference ffcf4590b2bc41a09b91cc5518113aff 30c0a43f-668f-4411-98b0-85bba71c4bdd false  https://im.runware.ai/image/ws/0.5/ii/30c0a43f-668f-4411-98b0-85bba71c4bdd.jpg}] []}]
+2024/10/15 17:51:40 Error: Connection timeout
+2024/10/15 17:54:32 Bot is starting
+2024/10/15 17:54:40 Client connetcted
+2024/10/15 17:54:40 User: zdesbyli asked: /start
+2024/10/15 17:54:42 Client connetcted
+2024/10/15 17:54:42 User: zdesbyli asked: /number_results
+2024/10/15 17:54:43 Client connetcted
+2024/10/15 17:54:43 User: zdesbyli asked: 5
+2024/10/15 17:54:45 Client connetcted
+2024/10/15 17:54:45 User: zdesbyli asked: cat
+2024/10/15 17:54:45 User: zdesbyli asked: cat
+2024/10/15 17:55:55 Bot is starting
+2024/10/15 17:55:56 Client connetcted
+2024/10/15 17:55:56 User: zdesbyli asked: /number_results
+2024/10/15 17:55:58 Client connetcted
+2024/10/15 17:55:58 User: zdesbyli asked: 2
+2024/10/15 17:56:00 Client connetcted
+2024/10/15 17:56:00 User: zdesbyli asked: cat
+2024/10/15 17:56:00 User: zdesbyli asked: cat
+2024/10/15 17:57:19 Bot is starting
+2024/10/15 17:57:27 Client connetcted
+2024/10/15 17:57:27 User: zdesbyli asked: /start
+2024/10/15 17:57:29 Client connetcted
+2024/10/15 17:57:29 User: zdesbyli asked: /number_results
+2024/10/15 17:57:30 Client connetcted
+2024/10/15 17:57:30 User: zdesbyli asked: 2
+2024/10/15 17:57:31 Client connetcted
+2024/10/15 17:57:31 User: zdesbyli asked: cat
+2024/10/15 17:57:31 User: zdesbyli asked: cat
+2024/10/15 17:57:42 UserID: 1444225833 authenticated with UUID:b9234c83-7249-4fd9-ad73-f834bf081da2
+2024/10/15 17:57:43 RESPONSE [{[{imageInference 4627b9373a2c41a3859d9f135781c57a 94ee8537-269d-4e14-9abf-3a06f52bffbc false  https://im.runware.ai/image/ws/0.5/ii/94ee8537-269d-4e14-9abf-3a06f52bffbc.jpg}] []} {[{imageInference 4627b9373a2c41a3859d9f135781c57a 6f83bbf5-396d-4dd4-9afa-94be281ce4b3 false  https://im.runware.ai/image/ws/0.5/ii/6f83bbf5-396d-4dd4-9afa-94be281ce4b3.jpg}] []}]
+2024/10/15 17:58:42 Error: Connection timeout
+2024/10/15 18:00:24 Bot is starting
+2024/10/15 18:00:24 Client connetcted
+2024/10/15 18:00:24 User: zdesbyli asked: /start
+2024/10/15 18:00:26 Client connetcted
+2024/10/15 18:00:26 User: zdesbyli asked: /number_results
+2024/10/15 18:00:27 Client connetcted
+2024/10/15 18:00:27 User: zdesbyli asked: 2
+2024/10/15 18:00:28 Client connetcted
+2024/10/15 18:00:28 User: zdesbyli asked: cat
+2024/10/15 18:00:28 User: zdesbyli asked: cat
+2024/10/15 18:00:39 UserID: 1444225833 authenticated with UUID:03988538-e7cb-447b-8e78-65ff657323c9
+2024/10/15 18:00:41 RESPONSE [{[{imageInference c1e28298b7ae4119b8b34842042f4de5 c90fe922-4daa-4772-ab57-8d76eaef5296 false  https://im.runware.ai/image/ws/0.5/ii/c90fe922-4daa-4772-ab57-8d76eaef5296.jpg}] []} {[{imageInference c1e28298b7ae4119b8b34842042f4de5 66e17895-8fbb-4626-a869-4b7efd6f8de8 false  https://im.runware.ai/image/ws/0.5/ii/66e17895-8fbb-4626-a869-4b7efd6f8de8.jpg}] []}]
+2024/10/15 18:00:58 Client connetcted
+2024/10/15 18:00:58 User: zdesbyli asked: /number_results
+2024/10/15 18:00:59 Client connetcted
+2024/10/15 18:00:59 User: zdesbyli asked: 5
+2024/10/15 18:01:02 Client connetcted
+2024/10/15 18:01:02 User: zdesbyli asked: cat
+2024/10/15 18:01:02 User: zdesbyli asked: cat
+2024/10/15 18:01:53 timeout waiting for response
+2024/10/15 18:02:02 Error: Connection timeout
+2024/10/15 18:02:03 Client connetcted
+2024/10/15 18:02:03 User: zdesbyli asked: /schedulers
+2024/10/15 18:02:07 Client connetcted
+2024/10/15 18:02:07 User: zdesbyli asked: Default
+2024/10/15 18:02:09 Client connetcted
+2024/10/15 18:02:09 User: zdesbyli asked: /number_results
+2024/10/15 18:02:10 Client connetcted
+2024/10/15 18:02:10 User: zdesbyli asked: 3
+2024/10/15 18:02:11 Client connetcted
+2024/10/15 18:02:11 User: zdesbyli asked: cats
+2024/10/15 18:02:11 User: zdesbyli asked: cats
+2024/10/15 18:02:22 UserID: 1444225833 authenticated with UUID:50aa6dcb-02a1-426f-af4f-9d94b9449c73
+2024/10/15 18:02:24 RESPONSE [{[{imageInference 70230674c7b94719b99f17b5f5827296 dfdf08a4-4201-497b-958c-ba97b106d453 false  https://im.runware.ai/image/ws/0.5/ii/dfdf08a4-4201-497b-958c-ba97b106d453.jpg}] []} {[{imageInference 70230674c7b94719b99f17b5f5827296 f97ed676-bff0-48d5-b293-6d9ccca53c19 false  https://im.runware.ai/image/ws/0.5/ii/f97ed676-bff0-48d5-b293-6d9ccca53c19.jpg}] []} {[{imageInference 70230674c7b94719b99f17b5f5827296 f1b877da-1f33-4266-8e2e-8c1fe83f3fee false  https://im.runware.ai/image/ws/0.5/ii/f1b877da-1f33-4266-8e2e-8c1fe83f3fee.jpg}] []}]
+2024/10/15 18:02:41 Client connetcted
+2024/10/15 18:02:41 User: zdesbyli asked: /number_results
+2024/10/15 18:02:43 Client connetcted
+2024/10/15 18:02:43 User: zdesbyli asked: 5
+2024/10/15 18:02:45 Client connetcted
+2024/10/15 18:02:45 User: zdesbyli asked: cats
+2024/10/15 18:02:45 User: zdesbyli asked: cats
+2024/10/15 18:03:37 timeout waiting for response
+2024/10/15 18:03:45 Error: Connection timeout
+2024/10/15 18:05:06 Bot is starting
+2024/10/15 18:05:10 Client connetcted
+2024/10/15 18:05:10 User: zdesbyli asked: /number_results
+2024/10/15 18:05:11 Client connetcted
+2024/10/15 18:05:11 User: zdesbyli asked: 5
+2024/10/15 18:05:13 Client connetcted
+2024/10/15 18:05:13 User: zdesbyli asked: cat
+2024/10/15 18:05:13 User: zdesbyli asked: cat
+2024/10/15 18:05:23 UserID: 1444225833 authenticated with UUID:721906c1-7af0-47c8-8171-77ceeddd7b7d
+2024/10/15 18:05:25 RESPONSE [{[{imageInference 0e97176b8d3145e0a25fa93f74001706 e5ca4913-27da-4db7-b505-d2b3ac8126fa false  https://im.runware.ai/image/ws/0.5/ii/e5ca4913-27da-4db7-b505-d2b3ac8126fa.jpg}] []} {[{imageInference 0e97176b8d3145e0a25fa93f74001706 999b0d0d-b2f9-4967-a6d7-976888e16ece false  https://im.runware.ai/image/ws/0.5/ii/999b0d0d-b2f9-4967-a6d7-976888e16ece.jpg}] []} {[{imageInference 0e97176b8d3145e0a25fa93f74001706 365a8c43-4e06-4c0f-a8bc-3beb21f75526 false  https://im.runware.ai/image/ws/0.5/ii/365a8c43-4e06-4c0f-a8bc-3beb21f75526.jpg}] []} {[{imageInference 0e97176b8d3145e0a25fa93f74001706 a65165da-467a-4320-a696-87082fb26ff9 false  https://im.runware.ai/image/ws/0.5/ii/a65165da-467a-4320-a696-87082fb26ff9.jpg}] []} {[{imageInference 0e97176b8d3145e0a25fa93f74001706 d49b8f55-ec7c-42f3-b87a-551f11ef23e2 false  https://im.runware.ai/image/ws/0.5/ii/d49b8f55-ec7c-42f3-b87a-551f11ef23e2.jpg}] []}]
+2024/10/15 18:05:46 Client connetcted
+2024/10/15 18:05:46 User: zdesbyli asked: /schedulers
+2024/10/15 18:05:47 Client connetcted
+2024/10/15 18:05:47 User: zdesbyli asked: DDIMScheduler
+2024/10/15 18:05:48 Client connetcted
+2024/10/15 18:05:48 User: zdesbyli asked: /schedulers
+2024/10/15 18:05:49 Client connetcted
+2024/10/15 18:05:49 User: zdesbyli asked: Default
+2024/10/15 18:05:49 Client connetcted
+2024/10/15 18:05:49 User: zdesbyli asked: /number_results
+2024/10/15 18:05:50 Client connetcted
+2024/10/15 18:05:50 User: zdesbyli asked: 10
+2024/10/15 18:05:53 Client connetcted
+2024/10/15 18:05:53 User: zdesbyli asked: cat
+2024/10/15 18:05:53 User: zdesbyli asked: cat
+2024/10/15 18:06:45 Error occurred while generating a picture. Please try again or change your settings. timeout waiting for response
+2024/10/15 18:06:53 Error: Connection timeout
+2024/10/15 18:11:16 Bot is starting
+2024/10/15 18:11:20 Client connetcted
+2024/10/15 18:11:20 User: zdesbyli asked: /number_results
+2024/10/15 18:11:21 Client connetcted
+2024/10/15 18:11:21 User: zdesbyli asked: 10
+2024/10/15 18:11:23 Client connetcted
+2024/10/15 18:11:23 User: zdesbyli asked: сфе
+2024/10/15 18:11:23 User: zdesbyli asked: сфе
+2024/10/15 18:11:34 UserID: 1444225833 authenticated with UUID:61f62e4b-8cee-444e-8e33-0a6b6b33a914
+2024/10/15 18:11:36 RESPONSE [{[{imageInference b37d15848ae44707841a6724f20fd15b a39290ea-0828-47d0-ab32-ea644b92a084 false  https://im.runware.ai/image/ws/0.5/ii/a39290ea-0828-47d0-ab32-ea644b92a084.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b 0d4a0bc3-9e5a-4382-97bb-8659c9a56fad false  https://im.runware.ai/image/ws/0.5/ii/0d4a0bc3-9e5a-4382-97bb-8659c9a56fad.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b e50f7b38-40b6-414b-b26c-aca13b4844e6 false  https://im.runware.ai/image/ws/0.5/ii/e50f7b38-40b6-414b-b26c-aca13b4844e6.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b 19f52abb-31ae-4e46-8755-f25f4e552083 false  https://im.runware.ai/image/ws/0.5/ii/19f52abb-31ae-4e46-8755-f25f4e552083.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b c44dd8eb-9b53-49b3-a7fc-baa0b5924d10 false  https://im.runware.ai/image/ws/0.5/ii/c44dd8eb-9b53-49b3-a7fc-baa0b5924d10.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b a499c540-2160-40d4-b52a-525d78910b13 false  https://im.runware.ai/image/ws/0.5/ii/a499c540-2160-40d4-b52a-525d78910b13.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b afdcd57c-df01-45da-b024-c6ef7fdc6393 false  https://im.runware.ai/image/ws/0.5/ii/afdcd57c-df01-45da-b024-c6ef7fdc6393.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b 5b16dd2f-a974-4c12-9a0c-0dae80b9605f false  https://im.runware.ai/image/ws/0.5/ii/5b16dd2f-a974-4c12-9a0c-0dae80b9605f.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b b0ffd7af-34a2-4328-9590-5f76bf43bea9 false  https://im.runware.ai/image/ws/0.5/ii/b0ffd7af-34a2-4328-9590-5f76bf43bea9.jpg}] []} {[{imageInference b37d15848ae44707841a6724f20fd15b 9398e83b-c459-4ebf-a857-e5001ccfd866 false  https://im.runware.ai/image/ws/0.5/ii/9398e83b-c459-4ebf-a857-e5001ccfd866.jpg}] []}]
+2024/10/15 18:12:25 Bot is starting
+2024/10/15 18:12:25 Client connetcted
+2024/10/15 18:12:25 User: zdesbyli asked: /number_results
+2024/10/15 18:12:27 Client connetcted
+2024/10/15 18:12:27 User: zdesbyli asked: 100
+2024/10/15 18:12:35 Client connetcted
+2024/10/15 18:12:35 User: zdesbyli asked: perfect girl
+2024/10/15 18:12:35 User: zdesbyli asked: perfect girl
+2024/10/15 18:12:46 UserID: 1444225833 authenticated with UUID:79c007ca-18ae-4088-afbe-21ef0fe088e4
+2024/10/15 18:12:46 Error: receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).
+2024/10/15 18:12:46 RESPONSE [{[] [{500 receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}]
+2024/10/15 18:14:22 Bot is starting
+2024/10/15 18:14:50 Client connetcted
+2024/10/15 18:14:50 User: zdesbyli asked: /start
+2024/10/15 18:14:55 Client connetcted
+2024/10/15 18:14:55 User: zdesbyli asked: /number_results
+2024/10/15 18:14:56 Client connetcted
+2024/10/15 18:14:56 User: zdesbyli asked: 5
+2024/10/15 18:14:59 Client connetcted
+2024/10/15 18:14:59 User: zdesbyli asked: perfect girl
+2024/10/15 18:14:59 User: zdesbyli asked: perfect girl
+2024/10/15 18:15:10 UserID: 1444225833 authenticated with UUID:3906f120-dad5-4a2e-ae23-ca0b61f82308
+2024/10/15 18:15:12 RESPONSE [{[{imageInference 886384e5243c4153bfd9dd2d5387e221 7e0bc1bf-dabc-4e9d-a189-d12f2e71b237 false  https://im.runware.ai/image/ws/0.5/ii/7e0bc1bf-dabc-4e9d-a189-d12f2e71b237.jpg}] []} {[{imageInference 886384e5243c4153bfd9dd2d5387e221 0c3c8b10-2ee4-42cd-a744-d3f9539e9c21 false  https://im.runware.ai/image/ws/0.5/ii/0c3c8b10-2ee4-42cd-a744-d3f9539e9c21.jpg}] []} {[{imageInference 886384e5243c4153bfd9dd2d5387e221 a0fdda0a-aa90-456c-a495-7a2023417b8a false  https://im.runware.ai/image/ws/0.5/ii/a0fdda0a-aa90-456c-a495-7a2023417b8a.jpg}] []} {[{imageInference 886384e5243c4153bfd9dd2d5387e221 76042375-0250-4efb-b7c7-4ae83391d0da false  https://im.runware.ai/image/ws/0.5/ii/76042375-0250-4efb-b7c7-4ae83391d0da.jpg}] []} {[{imageInference 886384e5243c4153bfd9dd2d5387e221 19ff8d28-b6d6-47f9-8258-9104fbef426c false  https://im.runware.ai/image/ws/0.5/ii/19ff8d28-b6d6-47f9-8258-9104fbef426c.jpg}] []}]
+2024/10/15 18:16:10 Error: Connection timeout
+2024/10/15 18:17:08 Bot is starting
+2024/10/15 18:17:08 Client connetcted
+2024/10/15 18:17:08 User: zdesbyli asked: /number_results
+2024/10/15 18:17:12 Client connetcted
+2024/10/15 18:17:12 User: zdesbyli asked: 5
+2024/10/15 18:17:16 Client connetcted
+2024/10/15 18:17:16 User: zdesbyli asked: perfect girl
+2024/10/15 18:17:16 User: zdesbyli asked: perfect girl
+2024/10/15 18:17:27 UserID: 1444225833 authenticated with UUID:448ae9e3-0f9d-46bf-b20c-7dc1663ee058
+2024/10/15 18:17:28 RESPONSE [{[{imageInference cd22e2dfbf9d44419f6ec20b9cadfc24 afc773f8-b118-4eab-96f1-5ad00a178e22 false  https://im.runware.ai/image/ws/0.5/ii/afc773f8-b118-4eab-96f1-5ad00a178e22.jpg}] []} {[{imageInference cd22e2dfbf9d44419f6ec20b9cadfc24 a044f251-47e5-49f9-a206-a30bd59f99a9 false  https://im.runware.ai/image/ws/0.5/ii/a044f251-47e5-49f9-a206-a30bd59f99a9.jpg}] []} {[{imageInference cd22e2dfbf9d44419f6ec20b9cadfc24 bd0fad48-dde5-4cfa-b3cf-b57b54786629 false  https://im.runware.ai/image/ws/0.5/ii/bd0fad48-dde5-4cfa-b3cf-b57b54786629.jpg}] []} {[{imageInference cd22e2dfbf9d44419f6ec20b9cadfc24 20fa835f-eeee-4b81-a009-ac2d9aa55f61 false  https://im.runware.ai/image/ws/0.5/ii/20fa835f-eeee-4b81-a009-ac2d9aa55f61.jpg}] []} {[{imageInference cd22e2dfbf9d44419f6ec20b9cadfc24 922bda46-b14e-4512-9b22-389337f2ee1d false  https://im.runware.ai/image/ws/0.5/ii/922bda46-b14e-4512-9b22-389337f2ee1d.jpg}] []}]
+2024/10/15 18:17:48 Client connetcted
+2024/10/15 18:17:48 User: zdesbyli asked: /number_results
+2024/10/15 18:17:49 Client connetcted
+2024/10/15 18:17:49 User: zdesbyli asked: 100
+2024/10/15 18:17:50 Client connetcted
+2024/10/15 18:17:50 User: zdesbyli asked: perfect girl
+2024/10/15 18:17:50 User: zdesbyli asked: perfect girl
+2024/10/15 18:17:50 Error: receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).
+2024/10/15 18:17:50 RESPONSE [{[] [{500 receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}]
+2024/10/15 18:18:56 Bot is starting
+2024/10/15 18:19:15 Client connetcted
+2024/10/15 18:19:15 User: zdesbyli asked: /number_results
+2024/10/15 18:19:16 Client connetcted
+2024/10/15 18:19:16 User: zdesbyli asked: 100
+2024/10/15 18:19:21 Client connetcted
+2024/10/15 18:19:21 User: zdesbyli asked: perfect girl
+2024/10/15 18:19:21 User: zdesbyli asked: perfect girl
+2024/10/15 18:19:31 UserID: 1444225833 authenticated with UUID:51eb410c-f607-476b-bc12-7b431fa28012
+2024/10/15 18:19:31 Error: receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).
+2024/10/15 18:19:31 RESPONSE [{[] [{500 receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 100
+2024/10/15 18:24:55 Bot is starting
+2024/10/15 18:24:56 Client connetcted
+2024/10/15 18:24:56 User: zdesbyli asked: /number_results
+2024/10/15 18:24:58 Client connetcted
+2024/10/15 18:24:58 User: zdesbyli asked: 100
+2024/10/15 18:25:04 Client connetcted
+2024/10/15 18:25:04 User: zdesbyli asked: perfect girl
+2024/10/15 18:25:04 User: zdesbyli asked: perfect girl
+2024/10/15 18:25:14 UserID: 1444225833 authenticated with UUID:ce64bb47-d788-4f43-8b60-f00d44084282
+2024/10/15 18:25:14 Error: receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).
+2024/10/15 18:25:14 RESPONSE [{[] [{500 receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 100
+2024/10/15 18:25:14 nil response
+2024/10/15 18:26:19 Bot is starting
+2024/10/15 18:26:20 Client connetcted
+2024/10/15 18:26:20 User: zdesbyli asked: /number_results
+2024/10/15 18:26:23 Client connetcted
+2024/10/15 18:26:23 User: zdesbyli asked: 100
+2024/10/15 18:26:26 Client connetcted
+2024/10/15 18:26:26 User: zdesbyli asked: perfect girl
+2024/10/15 18:26:26 User: zdesbyli asked: perfect girl
+2024/10/15 18:26:37 UserID: 1444225833 authenticated with UUID:e6af5cfe-171f-4583-a81a-26af5b1fa30e
+2024/10/15 18:26:37 Error: receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).
+2024/10/15 18:26:37 RESPONSE [{[] [{500 receive error: error response: Invalid value for numberResults parameter. The number of images requested must be an integer value between 1 and 20 (Default: 1).   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 100
+2024/10/15 18:26:37 nil response
+2024/10/15 18:26:43 Client connetcted
+2024/10/15 18:26:43 User: zdesbyli asked: /number_results
+2024/10/15 18:26:43 Client connetcted
+2024/10/15 18:26:43 User: zdesbyli asked: 20
+2024/10/15 18:26:46 Client connetcted
+2024/10/15 18:26:46 User: zdesbyli asked: perfect girl
+2024/10/15 18:26:46 User: zdesbyli asked: perfect girl
+2024/10/15 18:26:57 UserID: 1444225833 authenticated with UUID:8e6ec2b5-3837-4917-b718-f01a0cb468f4
+2024/10/15 18:27:37 Error: receive error: read tcp 172.23.244.154:40224->172.67.181.55:443: i/o timeout
+2024/10/15 18:27:37 RESPONSE [{[] [{500 receive error: read tcp 172.23.244.154:40224->172.67.181.55:443: i/o timeout   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 20
+2024/10/15 18:27:37 nil response
+2024/10/15 18:29:43 Bot is starting
+2024/10/15 18:30:02 Client connetcted
+2024/10/15 18:30:02 User: zdesbyli asked: /number_results
+2024/10/15 18:30:04 Client connetcted
+2024/10/15 18:30:04 User: zdesbyli asked: 20
+2024/10/15 18:30:08 Client connetcted
+2024/10/15 18:30:08 User: zdesbyli asked: /number_results
+2024/10/15 18:30:09 Client connetcted
+2024/10/15 18:30:09 User: zdesbyli asked: 5
+2024/10/15 18:30:11 Client connetcted
+2024/10/15 18:30:11 User: zdesbyli asked: perfect girl
+2024/10/15 18:30:11 User: zdesbyli asked: perfect girl
+2024/10/15 18:30:22 UserID: 1444225833 authenticated with UUID:af7c4da9-1d13-4f13-ba2d-05db96848307
+2024/10/15 18:30:24 RESPONSE [{[{imageInference de2c4de852d4448e93d4d2351f292918 b01b4eae-fafc-4c48-9b41-add0591f94ac false  https://im.runware.ai/image/ws/0.5/ii/b01b4eae-fafc-4c48-9b41-add0591f94ac.jpg}] []} {[{imageInference de2c4de852d4448e93d4d2351f292918 e9f571b9-d48d-4690-b7a9-ed4612194bf3 false  https://im.runware.ai/image/ws/0.5/ii/e9f571b9-d48d-4690-b7a9-ed4612194bf3.jpg}] []} {[{imageInference de2c4de852d4448e93d4d2351f292918 62a3fd66-def5-4b8f-95e6-d99484e568af false  https://im.runware.ai/image/ws/0.5/ii/62a3fd66-def5-4b8f-95e6-d99484e568af.jpg}] []} {[{imageInference de2c4de852d4448e93d4d2351f292918 5c9108e9-6277-4736-a4e6-6bcbdaf61ef4 false  https://im.runware.ai/image/ws/0.5/ii/5c9108e9-6277-4736-a4e6-6bcbdaf61ef4.jpg}] []} {[{imageInference de2c4de852d4448e93d4d2351f292918 7ad30ca2-7a23-4766-90de-879d7c2decf6 false  https://im.runware.ai/image/ws/0.5/ii/7ad30ca2-7a23-4766-90de-879d7c2decf6.jpg}] []}] 5
+2024/10/15 18:30:24 Error response []
+2024/10/15 18:31:19 Bot is starting
+2024/10/15 18:31:19 Client connetcted
+2024/10/15 18:31:19 User: zdesbyli asked: /number_results
+2024/10/15 18:31:24 Client connetcted
+2024/10/15 18:31:24 User: zdesbyli asked: 5
+2024/10/15 18:31:28 Client connetcted
+2024/10/15 18:31:28 User: zdesbyli asked: perfect girl
+2024/10/15 18:31:28 User: zdesbyli asked: perfect girl
+2024/10/15 18:31:39 UserID: 1444225833 authenticated with UUID:d972b320-1817-432b-9da3-17cf652491b9
+2024/10/15 18:31:41 RESPONSE [{[{imageInference 5226664b6836404aac05f7cf155e387e a56acb67-27d5-455c-8205-e4ffd76a9493 false  https://im.runware.ai/image/ws/0.5/ii/a56acb67-27d5-455c-8205-e4ffd76a9493.jpg}] []} {[{imageInference 5226664b6836404aac05f7cf155e387e d979911b-6a70-4305-8a03-a5812de13f18 false  https://im.runware.ai/image/ws/0.5/ii/d979911b-6a70-4305-8a03-a5812de13f18.jpg}] []} {[{imageInference 5226664b6836404aac05f7cf155e387e 21b494fa-dc61-4a3c-87c2-9a41cf053d5b false  https://im.runware.ai/image/ws/0.5/ii/21b494fa-dc61-4a3c-87c2-9a41cf053d5b.jpg}] []} {[{imageInference 5226664b6836404aac05f7cf155e387e a9a6d899-6933-45a5-b96d-412edca5fb38 false  https://im.runware.ai/image/ws/0.5/ii/a9a6d899-6933-45a5-b96d-412edca5fb38.jpg}] []} {[{imageInference 5226664b6836404aac05f7cf155e387e 5fba2f8e-2cb7-4599-b217-e2654f1a0273 false  https://im.runware.ai/image/ws/0.5/ii/5fba2f8e-2cb7-4599-b217-e2654f1a0273.jpg}] []}] 5
+2024/10/15 18:32:01 Client connetcted
+2024/10/15 18:32:01 User: zdesbyli asked: /number_results
+2024/10/15 18:32:03 Client connetcted
+2024/10/15 18:32:03 User: zdesbyli asked: 20
+2024/10/15 18:32:05 Client connetcted
+2024/10/15 18:32:05 User: zdesbyli asked: perfect girl
+2024/10/15 18:32:05 User: zdesbyli asked: perfect girl
+2024/10/15 18:32:57 Recieve message error: timeout waiting for response
+2024/10/15 18:33:06 Error: Connection timeout
+2024/10/15 18:36:26 Bot is starting
+2024/10/15 18:36:27 Client connetcted
+2024/10/15 18:36:27 User: zdesbyli asked: /number_results
+2024/10/15 18:36:29 Client connetcted
+2024/10/15 18:36:29 User: zdesbyli asked: 20
+2024/10/15 18:36:31 Client connetcted
+2024/10/15 18:36:31 User: zdesbyli asked: perfect girl
+2024/10/15 18:36:31 User: zdesbyli asked: perfect girl
+2024/10/15 18:36:42 UserID: 1444225833 authenticated with UUID:4681cd7d-6b48-4cae-a59c-14840fd005c6
+2024/10/15 18:37:22 Error: receive error: read tcp 172.23.244.154:51210->104.21.40.74:443: i/o timeout
+2024/10/15 18:37:22 RESPONSE [{[] [{500 receive error: read tcp 172.23.244.154:51210->104.21.40.74:443: i/o timeout   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 20
+2024/10/15 18:37:22 nil response
+2024/10/15 18:44:49 Bot is starting
+2024/10/15 18:44:49 Client connetcted
+2024/10/15 18:44:49 User: zdesbyli asked: /number_results
+2024/10/15 18:44:54 Client connetcted
+2024/10/15 18:44:54 User: zdesbyli asked: 20
+2024/10/15 18:44:58 Client connetcted
+2024/10/15 18:44:58 User: zdesbyli asked: perfect girl
+2024/10/15 18:44:58 User: zdesbyli asked: perfect girl
+2024/10/15 18:45:08 UserID: 1444225833 authenticated with UUID:fdc587b5-6a78-4c9a-b0d4-2b0c5098f6d2
+2024/10/15 18:46:28 Error: receive error: read tcp 172.23.244.154:40326->172.67.181.55:443: i/o timeout
+2024/10/15 18:46:28 RESPONSE [{[] [{500 receive error: read tcp 172.23.244.154:40326->172.67.181.55:443: i/o timeout   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 20
+2024/10/15 18:46:28 nil response
+2024/10/15 18:46:56 Bot is starting
+2024/10/15 18:46:57 Client connetcted
+2024/10/15 18:46:57 User: zdesbyli asked: /number_results
+2024/10/15 18:47:00 Client connetcted
+2024/10/15 18:47:00 User: zdesbyli asked: 5
+2024/10/15 18:47:04 Client connetcted
+2024/10/15 18:47:04 User: zdesbyli asked: perfect girl
+2024/10/15 18:47:04 User: zdesbyli asked: perfect girl
+2024/10/15 18:47:15 UserID: 1444225833 authenticated with UUID:acd57a92-5dcc-4fb6-a6dd-fbef623bc121
+2024/10/15 18:47:17 RESPONSE [{[{imageInference a21605a9eb664c69bb5bc481fdf70cac 0b2ba99c-a229-406b-a6e6-a54ab0e96305 false  https://im.runware.ai/image/ws/0.5/ii/0b2ba99c-a229-406b-a6e6-a54ab0e96305.jpg}] []} {[{imageInference a21605a9eb664c69bb5bc481fdf70cac 43a9d279-fd9e-465b-a692-82736e66cdbb false  https://im.runware.ai/image/ws/0.5/ii/43a9d279-fd9e-465b-a692-82736e66cdbb.jpg}] []} {[{imageInference a21605a9eb664c69bb5bc481fdf70cac c163cce1-8b6b-4107-984f-cd52d229eff2 false  https://im.runware.ai/image/ws/0.5/ii/c163cce1-8b6b-4107-984f-cd52d229eff2.jpg}] []} {[{imageInference a21605a9eb664c69bb5bc481fdf70cac bb13756c-07f2-4103-9e2a-c2f7836d2219 false  https://im.runware.ai/image/ws/0.5/ii/bb13756c-07f2-4103-9e2a-c2f7836d2219.jpg}] []} {[{imageInference a21605a9eb664c69bb5bc481fdf70cac ae09d578-a7e8-4231-8211-d1baa964fc29 false  https://im.runware.ai/image/ws/0.5/ii/ae09d578-a7e8-4231-8211-d1baa964fc29.jpg}] []}] 5
+2024/10/15 18:47:33 Client connetcted
+2024/10/15 18:47:33 User: zdesbyli asked: /number_results
+2024/10/15 18:47:34 Client connetcted
+2024/10/15 18:47:34 User: zdesbyli asked: 10
+2024/10/15 18:47:37 Client connetcted
+2024/10/15 18:47:37 User: zdesbyli asked: perfect girl
+2024/10/15 18:47:37 User: zdesbyli asked: perfect girl
+2024/10/15 18:49:19 Recieve message error: timeout waiting for response
+2024/10/15 18:49:26 Client connetcted
+2024/10/15 18:49:26 User: zdesbyli asked: /number_results
+2024/10/15 18:49:26 Client connetcted
+2024/10/15 18:49:26 User: zdesbyli asked: 5
+2024/10/15 18:49:32 Client connetcted
+2024/10/15 18:49:32 User: zdesbyli asked: perfect girl
+2024/10/15 18:49:32 User: zdesbyli asked: perfect girl
+2024/10/15 18:49:32 RESPONSE [{[{imageInference 7e4405d9ac3b4723be1273a85f03a74a 0ba2f518-c1de-4537-9c1a-5220b7b85bab false  https://im.runware.ai/image/ws/0.5/ii/0ba2f518-c1de-4537-9c1a-5220b7b85bab.jpg}] []} {[{imageInference 7e4405d9ac3b4723be1273a85f03a74a 12e5112a-9fb8-4932-ad32-a4df3b15c3d4 false  https://im.runware.ai/image/ws/0.5/ii/12e5112a-9fb8-4932-ad32-a4df3b15c3d4.jpg}] []} {[{imageInference 7e4405d9ac3b4723be1273a85f03a74a e47dccc0-06c3-4503-8f59-5d589143de55 false  https://im.runware.ai/image/ws/0.5/ii/e47dccc0-06c3-4503-8f59-5d589143de55.jpg}] []} {[{imageInference 7e4405d9ac3b4723be1273a85f03a74a b5f92f08-7ad9-4750-8437-8ef4c58632cc false  https://im.runware.ai/image/ws/0.5/ii/b5f92f08-7ad9-4750-8437-8ef4c58632cc.jpg}] []} {[{imageInference 7e4405d9ac3b4723be1273a85f03a74a 3a8a9905-30a5-48ef-8780-eb7582f5b5ae false  https://im.runware.ai/image/ws/0.5/ii/3a8a9905-30a5-48ef-8780-eb7582f5b5ae.jpg}] []}] 5
+2024/10/15 18:49:50 Client connetcted
+2024/10/15 18:49:50 User: zdesbyli asked: /number_results
+2024/10/15 18:49:51 Client connetcted
+2024/10/15 18:49:51 User: zdesbyli asked: 10
+2024/10/15 18:49:54 Client connetcted
+2024/10/15 18:49:54 User: zdesbyli asked: perfect girl
+2024/10/15 18:49:54 User: zdesbyli asked: perfect girl
+2024/10/15 18:49:54 Error: receive error: websocket: close 1006 (abnormal closure): unexpected EOF
+2024/10/15 18:49:54 RESPONSE [{[] [{500 receive error: websocket: close 1006 (abnormal closure): unexpected EOF   }]} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []} {[] []}] 10
+2024/10/15 18:49:54 nil response
+2024/10/15 18:50:12 Client connetcted
+2024/10/15 18:50:12 User: zdesbyli asked: perfect girl
+2024/10/15 18:50:12 User: zdesbyli asked: perfect girl
+2024/10/15 18:50:22 UserID: 1444225833 authenticated with UUID:b1eec01a-a976-465b-97cd-278a2a94af03
+2024/10/15 18:50:24 RESPONSE [{[{imageInference e5877eef14e04a82af392778806e6fe8 a5cc9287-5e66-4716-ba90-51e7cc7a907d false  https://im.runware.ai/image/ws/0.5/ii/a5cc9287-5e66-4716-ba90-51e7cc7a907d.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 a0a79972-e2dc-4f9c-bae0-d387ef3f7c80 false  https://im.runware.ai/image/ws/0.5/ii/a0a79972-e2dc-4f9c-bae0-d387ef3f7c80.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 b63ae905-f370-4cb4-9d5a-9d42a3f815da false  https://im.runware.ai/image/ws/0.5/ii/b63ae905-f370-4cb4-9d5a-9d42a3f815da.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 883dba77-f109-4bbf-af4e-15a1007389df false  https://im.runware.ai/image/ws/0.5/ii/883dba77-f109-4bbf-af4e-15a1007389df.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 d0c8d5d8-5c6f-42b6-88c7-9534b2f5d2b4 false  https://im.runware.ai/image/ws/0.5/ii/d0c8d5d8-5c6f-42b6-88c7-9534b2f5d2b4.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 57844026-71b0-4f02-b9e1-24bbfa43ccd9 false  https://im.runware.ai/image/ws/0.5/ii/57844026-71b0-4f02-b9e1-24bbfa43ccd9.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 8b1c7b8f-15e8-452a-90e4-92872ec16120 false  https://im.runware.ai/image/ws/0.5/ii/8b1c7b8f-15e8-452a-90e4-92872ec16120.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 46ccb172-76d6-4a80-9af8-41240cfe4fff false  https://im.runware.ai/image/ws/0.5/ii/46ccb172-76d6-4a80-9af8-41240cfe4fff.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 9928e4f2-fe09-4265-b2ea-4c983bcce0e0 false  https://im.runware.ai/image/ws/0.5/ii/9928e4f2-fe09-4265-b2ea-4c983bcce0e0.jpg}] []} {[{imageInference e5877eef14e04a82af392778806e6fe8 25a40232-a5b6-455b-961a-16750b51eb84 false  https://im.runware.ai/image/ws/0.5/ii/25a40232-a5b6-455b-961a-16750b51eb84.jpg}] []}] 10
+2024/10/15 19:12:29 Bot is starting
+2024/10/15 19:12:29 Client connetcted
+2024/10/15 19:12:29 User: zdesbyli asked: /start
+2024/10/15 19:12:32 Client connetcted
+2024/10/15 19:12:32 User: zdesbyli asked: /number_results
+2024/10/15 19:12:33 Client connetcted
+2024/10/15 19:12:33 User: zdesbyli asked: 2
+2024/10/15 19:12:35 Client connetcted
+2024/10/15 19:12:35 User: zdesbyli asked: cat
+2024/10/15 19:12:35 User: zdesbyli asked: cat
+2024/10/15 19:12:46 UserID: 1444225833 authenticated with UUID:8acb3798-4ec9-44c6-952d-c6b8ebd6628a
+2024/10/15 19:12:47 RESPONSE [{[{imageInference 24599a49f60044b1bdf9d1dcdee68446 6356630c-7f6a-4dff-acd0-2d77c98505e7 false  https://im.runware.ai/image/ws/0.5/ii/6356630c-7f6a-4dff-acd0-2d77c98505e7.jpg}] []} {[{imageInference 24599a49f60044b1bdf9d1dcdee68446 ed8aab03-4d41-440a-b740-cb5a8c0fc82a false  https://im.runware.ai/image/ws/0.5/ii/ed8aab03-4d41-440a-b740-cb5a8c0fc82a.jpg}] []}] 2
