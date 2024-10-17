@@ -256,6 +256,8 @@ func (b *Bot) Start() {
 							b.tg.Send(msg)
 							return
 						}
+						var mediaGroup []interface{}
+
 						for _, responseData := range response {
 							if len(responseData.Err) > 0 {
 								log.Println("Error response", responseData.Err)
@@ -265,42 +267,89 @@ func (b *Bot) Start() {
 							}
 							imageURL := string(responseData.Data[0].ImageURL)
 
-							// Загружаем изображение по URL
 							resp, err := http.Get(imageURL)
 							if err != nil {
-								// Обрабатываем ошибку, если не удалось загрузить изображение
 								fmt.Println(err)
 								msg := tgbotapi.NewMessage(chatID, "Failed to load image in tgChat")
 								b.tg.Send(msg)
 								return
 							}
+							defer resp.Body.Close()
 
-							// Читаем изображение из ответа
 							imageBytes, err := io.ReadAll(resp.Body)
 							if err != nil {
-								// Обрабатываем ошибку, если не удалось прочитать изображение
 								fmt.Println(err)
 								msg := tgbotapi.NewMessage(chatID, "Error while processing image")
 								b.tg.Send(msg)
 								return
 							}
 
-							// Создаем объект для отправки фото
-							photoFileBytes := tgbotapi.FileBytes{
+							// Добавляем изображение в слайс как InputMediaPhoto
+							photo := tgbotapi.NewInputMediaPhoto(tgbotapi.FileBytes{
 								Name:  "image",
 								Bytes: imageBytes,
-							}
-							photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
+							})
 
-							// Отправляем изображение пользователю
-							_, err = b.tg.Send(photoMsg)
+							mediaGroup = append(mediaGroup, photo)
+						}
+
+						// Отправляем все фотографии разом
+						if len(mediaGroup) > 0 {
+							mediaMsg := tgbotapi.NewMediaGroup(chatID, mediaGroup)
+
+							_, err := b.tg.SendMediaGroup(mediaMsg)
 							if err != nil {
-								// Обрабатываем ошибку при отправке сообщения
-								msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
+								// Обрабатываем ошибку при отправке
+								msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображения")
 								b.tg.Send(msg)
 								return
 							}
 						}
+						// for _, responseData := range response {
+						// 	if len(responseData.Err) > 0 {
+						// 		log.Println("Error response", responseData.Err)
+						// 		msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
+						// 		b.tg.Send(msg)
+						// 		return
+						// 	}
+						// 	imageURL := string(responseData.Data[0].ImageURL)
+
+						// 	// Загружаем изображение по URL
+						// 	resp, err := http.Get(imageURL)
+						// 	if err != nil {
+						// 		// Обрабатываем ошибку, если не удалось загрузить изображение
+						// 		fmt.Println(err)
+						// 		msg := tgbotapi.NewMessage(chatID, "Failed to load image in tgChat")
+						// 		b.tg.Send(msg)
+						// 		return
+						// 	}
+
+						// 	// Читаем изображение из ответа
+						// 	imageBytes, err := io.ReadAll(resp.Body)
+						// 	if err != nil {
+						// 		// Обрабатываем ошибку, если не удалось прочитать изображение
+						// 		fmt.Println(err)
+						// 		msg := tgbotapi.NewMessage(chatID, "Error while processing image")
+						// 		b.tg.Send(msg)
+						// 		return
+						// 	}
+
+						// 	// Создаем объект для отправки фото
+						// 	photoFileBytes := tgbotapi.FileBytes{
+						// 		Name:  "image",
+						// 		Bytes: imageBytes,
+						// 	}
+						// 	photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
+
+						// 	// Отправляем изображение пользователю
+						// 	_, err = b.tg.Send(photoMsg)
+						// 	if err != nil {
+						// 		// Обрабатываем ошибку при отправке сообщения
+						// 		msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
+						// 		b.tg.Send(msg)
+						// 		return
+						// 	}
+						// }
 					}
 				}()
 
