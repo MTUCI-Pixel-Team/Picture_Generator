@@ -148,7 +148,7 @@ func (b *Bot) Start() {
 		}
 		log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 		switch {
-		case update.Message.Text == "/powerOff":
+		case update.Message.Text == "/power_off":
 			msg := tgbotapi.NewMessage(chatID, "Please wait 2 minutes. Your profile restored to default settings.")
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
