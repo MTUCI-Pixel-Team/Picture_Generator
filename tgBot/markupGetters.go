@@ -135,7 +135,7 @@ func getDefaultMarkup() [][]tgbotapi.KeyboardButton {
 		row = append(row, button)
 
 		// Если добавили три кнопки в ряд, создаем новый ряд
-		if (i + 1) == 2 {
+		if i == 2 || i == 6 {
 			keyboard = append(keyboard, row)
 			row = []tgbotapi.KeyboardButton{} // Очищаем текущий ряд
 		}

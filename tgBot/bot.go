@@ -53,7 +53,7 @@ var (
 	}
 )
 
-var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/number_results", "/schedulers"}
+var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/number_results", "/schedulers", "/power_off"}
 
 var modelsOptions = map[string]string{
 	"default":               "runware:100@1@1",
@@ -64,6 +64,11 @@ var modelsOptions = map[string]string{
 	"Dream Shaper":          "civitai:4384@128713",
 	"ReV Animated":          "civitai:7371@425083",
 	"FLUX":                  "civitai:618692@691639",
+	"SD XL":                 "civitai:101055@128078",
+	"GhostMix (Anime)":      "civitai:36520@53738",
+	"epicRealism V2":        "civitai:25694@94744",
+	"AbsoluteReality":       "civitai:81458@132760",
+	"CyberRealistic":        "civitai:15003@114429",
 }
 
 var stepsOptions = []int{10, 15, 20, 30, 50, 75, 100}
