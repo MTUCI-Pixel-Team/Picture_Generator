@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	pg "github.com/prorok210/WS_Client-for_runware.ai-"
 
@@ -15,14 +16,15 @@ import (
 )
 
 type UserSettings struct {
-	steps           int
-	model           string
-	width           int
-	heigth          int
-	state           string
-	numberResults   int
-	scheduler       string
-	generatingMsgId int
+	steps              int
+	model              string
+	width              int
+	heigth             int
+	state              string
+	numberResults      int
+	scheduler          string
+	generatingMsgId    int
+	powerOffStartTimer time.Time
 	// Добавьте другие поля, которые могут быть полезны
 }
 
@@ -40,6 +42,15 @@ var (
 	defaultState         = "done"
 	defaultNumberResults = 1
 	defaultScheduler     = "Default"
+	defaultSettings      = &UserSettings{
+		steps:         defaultSteps,
+		model:         defaultModel,
+		state:         defaultState,
+		width:         defaultSize[0],
+		heigth:        defaultSize[1],
+		numberResults: defaultNumberResults,
+		scheduler:     defaultScheduler,
+	}
 )
 
 var serviceCommands = []string{"/start", "/help", "/models", "/steps", "/size", "/number_results", "/schedulers"}
@@ -126,29 +137,26 @@ func (b *Bot) Start() {
 
 		loadSettings, exists := b.userSettings.Load(chatID)
 		if !exists {
-			// По умолчанию
-			loadSettings = &UserSettings{
-				steps:         defaultSteps,
-				model:         defaultModel,
-				state:         defaultState,
-				width:         defaultSize[0],
-				heigth:        defaultSize[1],
-				numberResults: defaultNumberResults,
-				scheduler:     defaultScheduler,
-			}
-			b.userSettings.Store(chatID, loadSettings)
+			b.userSettings.Store(chatID, defaultSettings)
+			loadSettings = defaultSettings
 		}
 		settings := loadSettings.(*UserSettings)
+		if time.Since(settings.powerOffStartTimer) < 2*time.Minute {
+			msg := tgbotapi.NewMessage(chatID, "Please, wait. Your profile restored to default settings.")
+			b.tg.Send(msg)
+			continue
+		}
 		log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
 		switch {
-		case update.Message.Text == "/cancel":
-			msg := tgbotapi.NewMessage(chatID, "Operation canceled")
+		case update.Message.Text == "/powerOff":
+			msg := tgbotapi.NewMessage(chatID, "Please wait 2 minutes. Your profile restored to default settings.")
 			defaultKeyboard := getDefaultMarkup()
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(defaultKeyboard...)
 			b.tg.Send(msg)
-			settings.state = "waitingGenerate"
+			settings = defaultSettings
 			b.userSettings.Store(chatID, settings)
-		case settings.state == "done" || settings.state == "" || settings.state == "waitingGenerate":
+			settings.powerOffStartTimer = time.Now()
+		case settings.state == "done" || settings.state == "":
 			switch update.Message.Text {
 			case "/start":
 				msg := tgbotapi.NewMessage(chatID,
@@ -193,11 +201,6 @@ func (b *Bot) Start() {
 				handleSchedulers(b, update.Message.Text, chatID)
 			default:
 				// log.Println("User:", update.Message.Chat.UserName, "asked:", update.Message.Text)
-				if settings.state == "waitingGenerate" {
-					msg := tgbotapi.NewMessage(chatID, "Please choose a command from the keyboard while waiting for the generation to complete.")
-					b.tg.Send(msg)
-					continue
-				}
 				if len(update.Message.Text) < 3 {
 					msg := tgbotapi.NewMessage(chatID, "Description must be longer than 2 characters.")
 					b.tg.Send(msg)
@@ -305,51 +308,6 @@ func (b *Bot) Start() {
 								return
 							}
 						}
-						// for _, responseData := range response {
-						// 	if len(responseData.Err) > 0 {
-						// 		log.Println("Error response", responseData.Err)
-						// 		msg := tgbotapi.NewMessage(chatID, "Error occurred while generating a picture. Please try again or change your settings.")
-						// 		b.tg.Send(msg)
-						// 		return
-						// 	}
-						// 	imageURL := string(responseData.Data[0].ImageURL)
-
-						// 	// Загружаем изображение по URL
-						// 	resp, err := http.Get(imageURL)
-						// 	if err != nil {
-						// 		// Обрабатываем ошибку, если не удалось загрузить изображение
-						// 		fmt.Println(err)
-						// 		msg := tgbotapi.NewMessage(chatID, "Failed to load image in tgChat")
-						// 		b.tg.Send(msg)
-						// 		return
-						// 	}
-
-						// 	// Читаем изображение из ответа
-						// 	imageBytes, err := io.ReadAll(resp.Body)
-						// 	if err != nil {
-						// 		// Обрабатываем ошибку, если не удалось прочитать изображение
-						// 		fmt.Println(err)
-						// 		msg := tgbotapi.NewMessage(chatID, "Error while processing image")
-						// 		b.tg.Send(msg)
-						// 		return
-						// 	}
-
-						// 	// Создаем объект для отправки фото
-						// 	photoFileBytes := tgbotapi.FileBytes{
-						// 		Name:  "image",
-						// 		Bytes: imageBytes,
-						// 	}
-						// 	photoMsg := tgbotapi.NewPhoto(chatID, photoFileBytes)
-
-						// 	// Отправляем изображение пользователю
-						// 	_, err = b.tg.Send(photoMsg)
-						// 	if err != nil {
-						// 		// Обрабатываем ошибку при отправке сообщения
-						// 		msg := tgbotapi.NewMessage(chatID, "Не удалось отправить изображение")
-						// 		b.tg.Send(msg)
-						// 		return
-						// 	}
-						// }
 					}
 				}()
 
